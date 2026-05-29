@@ -2,6 +2,8 @@ import hashlib
 from core.exporter import Exporter
 from spiders.immuno_oncology import ImmunoOncologySpider
 from spiders.hanson_wade_spider import HansonWadeSpider
+from spiders.chi_spider import CHISpider
+from spiders.informa_spider import InformaSpider
 
 class Engine:
     def __init__(self):
@@ -157,6 +159,13 @@ class Engine:
             "genetherapy-neurological.com": (HansonWadeSpider, "5th Gene Therapy for Neurological Disorders Summit 2023", "Gene therapy", ""),
             "til-therapies.com": (HansonWadeSpider, "5th TIL Therapies Summit", "Cell Therapy", ""),
             "genetherapy-europe.com": (HansonWadeSpider, "Gene Therapy for Rare Disorders Europe Summit 2022", "Gene Therapy", ""),
+            "informaconnect.com": (InformaSpider, "BioProcess International 2024", "Both", "https://informaconnect.com/bioprocessinternational/speakers/"),
+            "bioprocessingsummit.com": (CHISpider, "16th Annual Bioprocessing Summit", "Both", "https://www.bioprocessingsummit.com/Streams/Cell-Therapy"),
+            "pegsummit.com": (CHISpider, "Pegs Boston CAR-T, TCRs and TILs", "Both", "https://www.pegsummit.com/"),
+            "discoveryontarget.com": (CHISpider, "Discovery on Target 2023", "Both", "https://www.discoveryontarget.com/"),
+            "immunogenicitysummit.com": (CHISpider, "Immunogenicity & Bioassay Summit - Immunogenicity Prediction and Control", "Both", "https://www.immunogenicitysummit.com/22/immunogenicity-prediction"),
+            "web.archive.org": (InformaSpider, "BPI 2022", "Both", "http://web.archive.org/web/20220711180806/https://informaconnect.com/bioprocessinternational/speakers/"),
+            "bioprocessingeurope.com": (CHISpider, "Bioprocessing summit 2021 - Cell Culture and Bioproduction", "Both", "https://www.bioprocessingeurope.com/21/cell-culture#Day2"),
         }
 
     def load_urls(self, url_list):
@@ -182,3 +191,5 @@ class Engine:
                 all_scraped_data.extend(data)
             else:
                 print(f"No specific spider found for {url}, skipping!")
+        
+        self.exporter.export(all_scraped_data)

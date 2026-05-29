@@ -1,13 +1,3 @@
-import time
-from core.engine import Engine
-
-class Launcher:
-    def __init__(self):
-        self.engine = Engine()
-        print("Bot initialized...")
-
-    def start(self):
-        print("Bot starting up...")
         self.engine.load_urls([
             "https://tcr-therapies-summit.com/",
             "https://mrna-processmanufacturing.com/",
@@ -166,13 +156,3 @@ class Launcher:
             "https://web.archive.org/",
             "https://bioprocessingeurope.com/",
         ])
-
-        self.engine.run()
-        print("Bot finished!")
-
-    def stop(self):
-        print("Bot stopped!")
-
-if __name__ == "__main__":
-    bot = Launcher()
-    bot.start()

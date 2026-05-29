@@ -1,4 +1,4 @@
-with open("new_urls_full.txt") as f:
+with open("new_urls_mega.txt") as f:
     urls_code = f.read()
 
 code = f"""import time
@@ -20,7 +20,6 @@ class Launcher:
 
 if __name__ == "__main__":
     bot = Launcher()
-    # Press play here in PyCharm!
     bot.start()
 """
 
