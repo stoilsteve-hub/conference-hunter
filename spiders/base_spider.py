@@ -1,20 +1,23 @@
-
 from playwright.sync_api import sync_playwright
 
 class BaseSpider:
-    def __init__(self, url, **kwargs):
+    def __init__(self, conference_id, conference_name, url, topic="", speaker_url=""):
+        self.conference_id = conference_id
+        self.conference_name = conference_name
         self.url = url
-        self.kwargs = kwargs
+        self.topic = topic
+        self.speaker_url = speaker_url
         self.data_template = {
-            "Conference ID": kwargs.get("conference_id", "AUTO"),
-            "Conference Name": kwargs.get("conference_name", "Unknown"),
-            "Topic": "Unknown",
+            "Conference ID": self.conference_id,
+            "Conference Name": self.conference_name,
+            "Topic": self.topic,
             "Dates": "TBD",
             "Location": "TBD",
             "Speaker First Name": "",
             "Speaker Full Name": "",
             "Speaker Job Title": "",
             "Speaker Company": "",
+            "Presentation Title": "",
             "Speaker Summary": "",
             "Speaker Profile": "",
             "Speaker Email": "",

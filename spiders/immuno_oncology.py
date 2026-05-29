@@ -22,7 +22,7 @@ class ImmunoOncologySpider(BaseSpider):
                         conf_date = date_loc
                 
                 # Now go to speakers page
-                target_url = self.url.rstrip("/") + "/speaker-biographies"
+                target_url = self.speaker_url if self.speaker_url else self.url.rstrip("/") + "/speaker-biographies"
                 page.goto(target_url, timeout=60000, wait_until="networkidle")
                 
                 # The names are inside strong tags. 
@@ -44,24 +44,38 @@ class ImmunoOncologySpider(BaseSpider):
                     lines = [line.strip() for line in parent_text.split("\n") if line.strip()]
                     
                     data = self.data_template.copy()
-                    data["Conference Name"] = "Immuno-Oncology Europe"
-                    data["Topic"] = "Immuno-Oncology"
+                    data["Conference Name"] = self.conference_name
+                    data["Topic"] = self.topic
                     data["Dates"] = conf_date.strip()
                     data["Location"] = conf_loc.strip()
                     data["Speaker Full Name"] = name
                     data["Speaker First Name"] = name.split(" ")[0]
                     
-                    if len(lines) > 1:
-                        title_company = lines[1]
-                        if "," in title_company:
-                            parts = title_company.split(",", 1)
+                    # Extract Job Title & Company
+                    spkr_org_text = s.evaluate("node => { let n = node.closest('.spkr-name'); return n && n.nextElementSibling && n.nextElementSibling.classList.contains('spkr-org') ? n.nextElementSibling.innerText : ''; }")
+                    
+                    if spkr_org_text:
+                        if "," in spkr_org_text:
+                            parts = spkr_org_text.split(",", 1)
                             data["Speaker Job Title"] = parts[0].strip()
                             data["Speaker Company"] = parts[1].strip()
                         else:
-                            data["Speaker Job Title"] = title_company
+                            data["Speaker Job Title"] = spkr_org_text
 
-                    # Extract bio text
-                    data["Speaker Summary"] = "\n".join(lines[2:]) if len(lines) > 2 else ""
+                    # Extract Bio by clicking
+                    try:
+                        has_bio = s.evaluate("node => { let n = node.closest('.spkr-name'); return n && n.parentElement ? !!Array.from(n.parentElement.querySelectorAll('a')).find(a => a.innerText.includes('Bio')) : false; }")
+                        if has_bio:
+                            s.evaluate("node => { let n = node.closest('.spkr-name'); let a = Array.from(n.parentElement.querySelectorAll('a')).find(a => a.innerText.includes('Bio')); if(a) a.click(); }")
+                            page.wait_for_selector(".spkr-modal-content", timeout=5000, state="visible")
+                            modal_text = page.locator(".spkr-modal-content:visible").first.inner_text()
+                            data["Speaker Summary"] = modal_text
+                            
+                            # Close the modal so it doesn't block the next click
+                            page.evaluate("if(document.querySelector('.spkr-modal-close:visible')) document.querySelector('.spkr-modal-close:visible').click()")
+                            page.wait_for_timeout(500) # give it a moment to close
+                    except Exception as e:
+                        pass
                     
                     # Email Validation Helper
                     def is_valid_email(em, name, company):

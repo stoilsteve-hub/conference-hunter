@@ -8,7 +8,7 @@ class Exporter:
         self.columns = [
             "Conference ID", "Conference Name", "Topic", "Dates", "Location",
             "Speaker First Name", "Speaker Full Name", "Speaker Job Title",
-            "Speaker Company", "Speaker Summary", "Speaker Profile",
+            "Speaker Company", "Presentation Title", "Speaker Summary", "Speaker Profile",
             "Speaker Email", "Speaker Image URL", "Speaker LinkedIn"
         ]
 

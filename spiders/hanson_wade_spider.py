@@ -1,10 +1,10 @@
 from spiders.base_spider import BaseSpider
 from playwright.sync_api import sync_playwright
 
-class CDXEuropeSpider(BaseSpider):
+class HansonWadeSpider(BaseSpider):
     def extract(self):
         results = []
-        print(f"Scraping CDX Europe at {self.url}")
+        print(f"Scraping {self.conference_name} at {self.url}")
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
             page = browser.new_page()
@@ -28,6 +28,16 @@ class CDXEuropeSpider(BaseSpider):
                             conf_date = line.strip()
                             break
                 
+                # Now go to speakers page
+                speakers_url = self.speaker_url if self.speaker_url else self.url.rstrip("/") + "/speakers/"
+                try:
+                    response = page.goto(speakers_url, timeout=60000, wait_until="networkidle")
+                    if response and response.status == 404:
+                        # Fallback to homepage if /speakers/ is missing
+                        page.goto(self.url, timeout=60000, wait_until="networkidle")
+                except Exception:
+                    pass
+                
                 # Get links
                 links = page.locator("a").all()
                 speaker_links = []
@@ -47,11 +57,11 @@ class CDXEuropeSpider(BaseSpider):
                 # deduplicate
                 unique_speakers = {s["name"]: s for s in speaker_links}.values()
                 
-                for s in list(unique_speakers)[:10]: # Limit to 10 for speed during testing
+                for s in list(unique_speakers): # Removed test limit
                     print(f"Deep scraping: {s['name']}")
                     data = self.data_template.copy()
-                    data["Conference Name"] = "CDX Europe"
-                    data["Topic"] = "Biomarkers & Diagnostics"
+                    data["Conference Name"] = self.conference_name
+                    data["Topic"] = self.topic
                     data["Dates"] = conf_date
                     data["Location"] = conf_loc
                     data["Speaker Full Name"] = s["name"]
@@ -63,6 +73,13 @@ class CDXEuropeSpider(BaseSpider):
                     try:
                         page.goto(s["url"], timeout=30000, wait_until="domcontentloaded")
                         
+                        # Extract presentation topic
+                        text = page.locator("body").inner_text()
+                        if "Seminars\n" in text:
+                            parts = text.split("Seminars\n")[1].strip().split("\n")
+                            if len(parts) > 1:
+                                data["Presentation Title"] = parts[1].strip()
+                        
                         # Extract bio
                         paragraphs = page.locator(".hw-speaker-content p").all()
                         if not paragraphs:
@@ -72,7 +89,8 @@ class CDXEuropeSpider(BaseSpider):
                         garbage_phrases = [
                             "cookies", "privacy", "thank you to our speakers", 
                             "ambitious people", "hanson wade", "this website uses", 
-                            "by clicking", "opt out"
+                            "by clicking", "opt out", "why not join us", "next event in the", 
+                            "summit here", "register interest", "discover the"
                         ]
                         for p_elem in paragraphs:
                             pt = p_elem.inner_text().strip()
