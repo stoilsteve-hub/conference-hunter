@@ -34,6 +34,7 @@ class ImmunoOncologySpider(BaseSpider):
                     data["Conference Name"] = "Immuno-Oncology Europe"
                     data["Topic"] = "Immuno-Oncology"
                     data["Speaker Full Name"] = name
+                    data["Speaker First Name"] = name.split(" ")[0]
                     
                     # Lines usually look like:
                     # Name, PhD

@@ -22,6 +22,7 @@ class LNPFormulationSpider(BaseSpider):
                             data["Conference Name"] = "LNP Formulation"
                             data["Topic"] = "Pharma Formulation"
                             data["Speaker Full Name"] = lines[0].strip()
+                            data["Speaker First Name"] = lines[0].strip().split(" ")[0]
                             data["Speaker Job Title"] = lines[1].strip()
                             data["Speaker Company"] = lines[2].strip()
                             data["Speaker Profile"] = href
