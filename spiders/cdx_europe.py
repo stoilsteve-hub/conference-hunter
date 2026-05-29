@@ -45,12 +45,19 @@ class CDXEuropeSpider(BaseSpider):
                         page.goto(s["url"], timeout=30000)
                         
                         # Extract bio
-                        paragraphs = page.locator("p").all()
+                        paragraphs = page.locator(".hw-speaker-content p").all()
+                        if not paragraphs:
+                            paragraphs = page.locator("p").all()
+                        
                         bio_text = []
+                        garbage_phrases = [
+                            "cookies", "privacy", "thank you to our speakers", 
+                            "ambitious people", "hanson wade", "this website uses", 
+                            "by clicking", "opt out"
+                        ]
                         for p_elem in paragraphs:
                             pt = p_elem.inner_text().strip()
-                            # simple heuristic to skip cookie banners/footer
-                            if len(pt) > 50 and "cookies" not in pt.lower() and "privacy" not in pt.lower():
+                            if len(pt) > 50 and not any(phrase in pt.lower() for phrase in garbage_phrases):
                                 bio_text.append(pt)
                         data["Speaker Summary"] = "\n\n".join(bio_text)
                         
