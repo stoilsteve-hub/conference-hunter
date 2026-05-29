@@ -12,6 +12,17 @@ class ImmunoOncologySpider(BaseSpider):
                 target_url = self.url.rstrip("/") + "/speaker-biographies"
                 page.goto(target_url, timeout=60000, wait_until="domcontentloaded")
                 
+                # Extract Date and Location from Title
+                conf_date = "TBD"
+                conf_loc = "TBD"
+                title = page.title()
+                if "|" in title:
+                    date_loc = title.split("|")[-1].strip()
+                    if " in " in date_loc:
+                        conf_date, conf_loc = date_loc.split(" in ", 1)
+                    else:
+                        conf_date = date_loc
+                
                 # The names are inside strong tags. 
                 strongs = page.locator("p > strong, div > strong").all()
                 seen_names = set()
@@ -33,6 +44,8 @@ class ImmunoOncologySpider(BaseSpider):
                     data = self.data_template.copy()
                     data["Conference Name"] = "Immuno-Oncology Europe"
                     data["Topic"] = "Immuno-Oncology"
+                    data["Dates"] = conf_date.strip()
+                    data["Location"] = conf_loc.strip()
                     data["Speaker Full Name"] = name
                     data["Speaker First Name"] = name.split(" ")[0]
                     

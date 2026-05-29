@@ -11,6 +11,17 @@ class CDXEuropeSpider(BaseSpider):
             try:
                 page.goto(self.url, timeout=60000, wait_until="domcontentloaded")
                 
+                # Extract Date and Location
+                conf_date = "TBD"
+                conf_loc = "TBD"
+                months = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"]
+                for line in page.locator("body").inner_text().split("\n")[:100]:
+                    if "|" in line and any(m in line.lower() for m in months):
+                        parts = line.split("|", 1)
+                        conf_date = parts[0].replace("Returning", "").replace("Ran", "").strip()
+                        conf_loc = parts[1].strip()
+                        break
+                
                 # Get links
                 links = page.locator("a").all()
                 speaker_links = []
@@ -35,6 +46,8 @@ class CDXEuropeSpider(BaseSpider):
                     data = self.data_template.copy()
                     data["Conference Name"] = "CDX Europe"
                     data["Topic"] = "Biomarkers & Diagnostics"
+                    data["Dates"] = conf_date
+                    data["Location"] = conf_loc
                     data["Speaker Full Name"] = s["name"]
                     data["Speaker First Name"] = s["name"].split(" ")[0]
                     data["Speaker Job Title"] = s["title"]
