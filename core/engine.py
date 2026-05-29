@@ -1,3 +1,4 @@
+import hashlib
 from core.exporter import Exporter
 from spiders.immuno_oncology import ImmunoOncologySpider
 from spiders.peptide_summit import PeptideSummitSpider
@@ -33,7 +34,8 @@ class Engine:
                     break
             
             if spider_class:
-                scraper = spider_class(conference_id="auto", conference_name="auto", url=url)
+                conf_id = "CONF-" + hashlib.md5(url.encode()).hexdigest()[:6].upper()
+                scraper = spider_class(conference_id=conf_id, conference_name="auto", url=url)
                 data = scraper.extract()
                 all_scraped_data.extend(data)
             else:

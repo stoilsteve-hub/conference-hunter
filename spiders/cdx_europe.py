@@ -11,22 +11,62 @@ class CDXEuropeSpider(BaseSpider):
             try:
                 page.goto(self.url, timeout=60000)
                 
+                # Get links
                 links = page.locator("a").all()
+                speaker_links = []
                 for link in links:
                     href = str(link.get_attribute("href"))
                     text = link.inner_text().strip()
                     if "/speaker/" in href and "\n" in text:
                         lines = text.split("\n")
                         if len(lines) >= 3:
-                            data = self.data_template.copy()
-                            data["Conference Name"] = "CDX Europe"
-                            data["Topic"] = "Biomarkers & Diagnostics"
-                            data["Speaker Full Name"] = lines[0].strip()
-                            data["Speaker First Name"] = lines[0].strip().split(" ")[0]
-                            data["Speaker Job Title"] = lines[1].strip()
-                            data["Speaker Company"] = lines[2].strip()
-                            data["Speaker Profile"] = href
-                            results.append(data)
+                            speaker_links.append({
+                                "url": href,
+                                "name": lines[0].strip(),
+                                "title": lines[1].strip(),
+                                "company": lines[2].strip()
+                            })
+                
+                # deduplicate
+                unique_speakers = {s["name"]: s for s in speaker_links}.values()
+                
+                for s in list(unique_speakers)[:10]: # Limit to 10 for speed during testing
+                    print(f"Deep scraping: {s['name']}")
+                    data = self.data_template.copy()
+                    data["Conference Name"] = "CDX Europe"
+                    data["Topic"] = "Biomarkers & Diagnostics"
+                    data["Speaker Full Name"] = s["name"]
+                    data["Speaker First Name"] = s["name"].split(" ")[0]
+                    data["Speaker Job Title"] = s["title"]
+                    data["Speaker Company"] = s["company"]
+                    data["Speaker Profile"] = s["url"]
+                    
+                    try:
+                        page.goto(s["url"], timeout=30000)
+                        
+                        # Extract bio
+                        paragraphs = page.locator("p").all()
+                        bio_text = []
+                        for p_elem in paragraphs:
+                            pt = p_elem.inner_text().strip()
+                            # simple heuristic to skip cookie banners/footer
+                            if len(pt) > 50 and "cookies" not in pt.lower() and "privacy" not in pt.lower():
+                                bio_text.append(pt)
+                        data["Speaker Summary"] = "\n\n".join(bio_text)
+                        
+                        # Extract image
+                        imgs = page.locator("img").all()
+                        for img in imgs:
+                            src = img.get_attribute("src")
+                            if src and ("uploads" in src and "logo" not in src.lower() and "hw-group" not in src.lower()):
+                                data["Speaker Image URL"] = src
+                                data["Speaker Image Local Path"] = self.download_image(src, s["name"])
+                                break
+                    except Exception as e:
+                        print(f"Failed to deep scrape {s['url']}: {e}")
+                        
+                    results.append(data)
+                    
             except Exception as e:
                 print(f"Error on {self.url}: {e}")
             finally:

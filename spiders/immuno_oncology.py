@@ -36,10 +36,6 @@ class ImmunoOncologySpider(BaseSpider):
                     data["Speaker Full Name"] = name
                     data["Speaker First Name"] = name.split(" ")[0]
                     
-                    # Lines usually look like:
-                    # Name, PhD
-                    # Job Title, Company
-                    # So we grab the next line after the name if it exists
                     if len(lines) > 1:
                         title_company = lines[1]
                         if "," in title_company:
@@ -48,6 +44,22 @@ class ImmunoOncologySpider(BaseSpider):
                             data["Speaker Company"] = parts[1].strip()
                         else:
                             data["Speaker Job Title"] = title_company
+
+                    # Extract bio text
+                    data["Speaker Summary"] = "\n".join(lines[2:]) if len(lines) > 2 else ""
+                    
+                    # Extract image
+                    parent_element = s.evaluate_handle("node => node.parentNode.parentNode")
+                    if parent_element:
+                        img_handle = parent_element.query_selector("img")
+                        if img_handle:
+                            src = img_handle.get_attribute("src")
+                            if src:
+                                # handle relative paths
+                                if src.startswith("/"):
+                                    src = "https://www.immuno-oncologyeurope.com" + src
+                                data["Speaker Image URL"] = src
+                                data["Speaker Image Local Path"] = self.download_image(src, name)
                     
                     results.append(data)
             except Exception as e:
