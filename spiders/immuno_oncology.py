@@ -10,7 +10,7 @@ class ImmunoOncologySpider(BaseSpider):
             page = browser.new_page()
             try:
                 target_url = self.url.rstrip("/") + "/speaker-biographies"
-                page.goto(target_url, timeout=60000)
+                page.goto(target_url, timeout=60000, wait_until="domcontentloaded")
                 
                 # The names are inside strong tags. 
                 strongs = page.locator("p > strong, div > strong").all()
@@ -48,21 +48,35 @@ class ImmunoOncologySpider(BaseSpider):
                     # Extract bio text
                     data["Speaker Summary"] = "\n".join(lines[2:]) if len(lines) > 2 else ""
                     
+                    # Email Validation Helper
+                    def is_valid_email(em, name, company):
+                        em = em.lower()
+                        if any(g in em for g in ["info@", "contact@", "enquiries@", "admin@", "sales@", "hansonwade", "cambridgeinnovationinstitute"]):
+                            return False
+                        prefix, domain = em.split("@", 1)
+                        name_parts = [p.lower() for p in name.split() if len(p) > 2]
+                        comp_parts = [w.lower() for w in company.split() if len(w) > 2 and w.lower() not in ["inc", "llc", "ltd", "corp"]]
+                        
+                        if any(np in prefix for np in name_parts): return True
+                        if any(cp in domain for cp in comp_parts): return True
+                        return False
+
                     # Extract email
                     import re
                     email_pattern = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
-                    emails = re.findall(email_pattern, data["Speaker Summary"])
-                    if emails:
-                        data["Speaker Email"] = emails[0]
-                    else:
-                        # try looking for mailto links in the parent
-                        parent_element = s.evaluate_handle("node => node.parentNode.parentNode")
-                        if parent_element:
-                            for a_tag in parent_element.query_selector_all("a"):
-                                href = a_tag.get_attribute("href")
-                                if href and href.startswith("mailto:"):
-                                    data["Speaker Email"] = href.replace("mailto:", "").strip()
-                                    break
+                    potential_emails = []
+                    potential_emails.extend(re.findall(email_pattern, data["Speaker Summary"]))
+                    parent_element = s.evaluate_handle("node => node.parentNode.parentNode")
+                    if parent_element:
+                        for a_tag in parent_element.query_selector_all("a"):
+                            href = a_tag.get_attribute("href")
+                            if href and href.startswith("mailto:"):
+                                potential_emails.append(href.replace("mailto:", "").split("?")[0].strip())
+                                
+                    for em in potential_emails:
+                        if is_valid_email(em, data["Speaker Full Name"], data.get("Speaker Company", "")):
+                            data["Speaker Email"] = em
+                            break
                     
                     # Extract image
                     parent_element = s.evaluate_handle("node => node.parentNode.parentNode")

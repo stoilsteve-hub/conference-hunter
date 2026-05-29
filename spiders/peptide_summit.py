@@ -9,7 +9,7 @@ class PeptideSummitSpider(BaseSpider):
             browser = p.chromium.launch(headless=True)
             page = browser.new_page()
             try:
-                page.goto(self.url, timeout=60000)
+                page.goto(self.url, timeout=60000, wait_until="domcontentloaded")
                 
                 # Get links
                 links = page.locator("a").all()
@@ -42,7 +42,7 @@ class PeptideSummitSpider(BaseSpider):
                     data["Speaker Profile"] = s["url"]
                     
                     try:
-                        page.goto(s["url"], timeout=30000)
+                        page.goto(s["url"], timeout=30000, wait_until="domcontentloaded")
                         
                         # Extract bio
                         paragraphs = page.locator(".hw-speaker-content p").all()
@@ -61,19 +61,33 @@ class PeptideSummitSpider(BaseSpider):
                                 bio_text.append(pt)
                         data["Speaker Summary"] = "\n\n".join(bio_text)
                         
+                        # Email Validation Helper
+                        def is_valid_email(em, name, company):
+                            em = em.lower()
+                            if any(g in em for g in ["info@", "contact@", "enquiries@", "admin@", "sales@", "hansonwade"]):
+                                return False
+                            prefix, domain = em.split("@", 1)
+                            name_parts = [p.lower() for p in name.split() if len(p) > 2]
+                            comp_parts = [w.lower() for w in company.split() if len(w) > 2 and w.lower() not in ["inc", "llc", "ltd", "corp"]]
+                            
+                            if any(np in prefix for np in name_parts): return True
+                            if any(cp in domain for cp in comp_parts): return True
+                            return False
+
                         # Extract email
                         import re
                         email_pattern = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
-                        emails = re.findall(email_pattern, data["Speaker Summary"])
-                        if emails:
-                            data["Speaker Email"] = emails[0]
-                        else:
-                            # Try searching all hrefs for mailto
-                            for a_tag in page.locator("a").all():
-                                href = a_tag.get_attribute("href")
-                                if href and href.startswith("mailto:"):
-                                    data["Speaker Email"] = href.replace("mailto:", "").strip()
-                                    break
+                        potential_emails = []
+                        potential_emails.extend(re.findall(email_pattern, data["Speaker Summary"]))
+                        for a_tag in page.locator("a").all():
+                            href = a_tag.get_attribute("href")
+                            if href and href.startswith("mailto:"):
+                                potential_emails.append(href.replace("mailto:", "").split("?")[0].strip())
+                                
+                        for em in potential_emails:
+                            if is_valid_email(em, s["name"], s["company"]):
+                                data["Speaker Email"] = em
+                                break
                         
                         # Extract image
                         imgs = page.locator("img").all()
