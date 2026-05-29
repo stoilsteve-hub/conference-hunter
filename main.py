@@ -9,7 +9,13 @@ class Launcher:
     def start(self):
         print("Bot starting up...")
         # give it some dummy urls to test
-        self.engine.load_urls(["http://example-pharma.com", "http://another-test.com"])
+        self.engine.load_urls([
+            "https://www.immuno-oncologyeurope.com/",
+            "https://peptide-based-therapeutics-summit.com/",
+            "https://cdx-europe.com/",
+            "https://lnp-formulation-process-development-pharma.com/",
+            "https://genetherapy-conference.com/"
+        ])
         self.engine.run()
         print("Bot finished!")
 
