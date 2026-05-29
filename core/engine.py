@@ -174,9 +174,36 @@ class Engine:
         self.urls = url_list
         print(f"Loaded {len(self.urls)} urls to scrape.")
 
-    def run(self):
+    def run(self, max_workers=20):
         print("Engine starting... gonna loop through urls now")
         
+        failed_domains = [
+            "mrna-processmanufacturing.com", "cell-therapy-analytics-europe.com", "genetherapy-ophthalmology.com",
+            "genetherapy-immunogenicity.com", "inner-ear-disorders-therapeutics.com", "gamma-delta-t-therapies-summit.com",
+            "genetherapy-patient-engagement.com", "mrna-quality-control.com", "genetherapy-neurological-europe.com",
+            "cell-therapy-potency-assay.com", "allogeneic-cell-therapies.com", "ipsc-manufacturing-summit.com",
+            "mrna-processmanufacturing-europe.com", "genetherapy-comparability.com", "supply-cell-immunotherapy.com",
+            "allogeneic-cell-therapies-europe.com", "synthetic-biology-therapeutics-summit.com", "dry-amd-therapeutics.com",
+            "innate-killer-europe.com", "macrophage-directed-therapies.com", "b-and-t-cell-for-autoimmune.com",
+            "optimizing-aav-safety.com", "innerear-disorders-therapeutics.com", "multi-functional-cell-therapies.com",
+            "lab-asset-facility-europe.com", "wet-amd-drug-development.com", "innatekiller.com",
+            "continuous-processing-pharma.com", "fermentation-enabled-proteins.com", "cns-proteindegradation.com",
+            "kinase-drug-discovery-summit.com", "tumor-models-sf.com", "adc-targetselection.com",
+            "applied-biocatalysis.com", "rna-drugdiscovery.com", "capital-project-engineering.com",
+            "targeted-radiopharma.com", "claudin-targeted-therapies-summit.com", "cns-drug-delivery-summit.com",
+            "personalized-cancer-vaccines.com", "cell-therapy-autoimmune-disease.com", "donor-selection-cell-source-summit.com",
+            "genetherapy-cns.com", "tpd-europe.com", "spatialbiology-drugdevelopment.com",
+            "targeted-radiopharma-manuf-supply.com", "adc-process-development.com", "crispr-analytical-development.com",
+            "targeted-radiopharma-us2.com", "gamma-delta-t-therapies.com", "induced-proximity-summit.com",
+            "genetherapy-potency-assay.com", "microbiome-summit.com", "hpapi-summit.com",
+            "next-gen-genetherapy-vectors.com", "tumor-myeloid-therapeutics.com", "computational-rna-design-delivery.com",
+            "cytokine-immunotherapies.com", "cell-engager-summit.com", "adc-payload-summit.com",
+            "als-drug-development.com", "glp-1-based-therapeutics.com", "advanced-procurement-in-pharma.com",
+            "next-gen-rna.com", "neoantigen-summit.com", "genetherapy-muscular.com",
+            "translational-digital-pathology-ai.com", "genetherapy-analytical.com", "genetherapy-neurological.com",
+            "til-therapies.com", "genetherapy-europe.com", "discoveryontarget.com"
+        ]
+
         def scrape_url(url):
             spider_tuple = None
             for domain, spider_tup in self.spider_map.items():
@@ -186,6 +213,13 @@ class Engine:
             
             if spider_tuple:
                 spider_class, conf_name, topic, speaker_url = spider_tuple
+                
+                # Dynamic override: Route to ArchiveSpider if in failed_domains
+                if any(fd in url for fd in failed_domains):
+                    from spiders.archive_spider import ArchiveSpider
+                    spider_class = ArchiveSpider
+                    
+                import hashlib
                 conf_id = "CONF-" + hashlib.md5(url.encode()).hexdigest()[:6].upper()
                 scraper = spider_class(conference_id=conf_id, conference_name=conf_name, topic=topic, url=url, speaker_url=speaker_url)
                 return scraper.extract()
@@ -194,14 +228,26 @@ class Engine:
                 return []
 
         all_scraped_data = []
-        with ThreadPoolExecutor(max_workers=20) as executor:
+        import time
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
             future_to_url = {executor.submit(scrape_url, url): url for url in self.urls}
             for future in as_completed(future_to_url):
                 try:
                     data = future.result()
                     if data:
                         all_scraped_data.extend(data)
-                except Exception as exc:
-                    print(f"URL generated an exception: {exc}")
+                        
+                        # Save incrementally
+                        if len(all_scraped_data) > 0:
+                            self.exporter.save_data(all_scraped_data)
+                            all_scraped_data = [] # Reset after saving
+                    
+                    # Add delay if running sequentially to avoid bot blocks
+                    if max_workers == 1:
+                        time.sleep(2)
+                except Exception as e:
+                    url = future_to_url[future]
+                    print(f"URL generated an exception: {e}")
         
         self.exporter.save_data(all_scraped_data)
