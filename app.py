@@ -117,6 +117,40 @@ else:
         
     st.markdown("---")
     
+    # Download Section
+    import io
+    
+    @st.cache_data
+    def convert_df_to_excel(df_to_convert):
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df_to_convert.to_excel(writer, index=False, sheet_name='Speakers')
+        return output.getvalue()
+
+    st.subheader("📥 Export Data")
+    dl_col1, dl_col2 = st.columns(2)
+    
+    with dl_col1:
+        st.download_button(
+            label="Download Filtered Selection (Excel)",
+            data=convert_df_to_excel(filtered_df),
+            file_name="conference_selection.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            use_container_width=True
+        )
+        
+    with dl_col2:
+        st.download_button(
+            label="Download Full Database (Excel)",
+            data=convert_df_to_excel(df),
+            file_name="conference_full_database.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            type="primary",
+            use_container_width=True
+        )
+        
+    st.markdown("---")
+    
     # Main Content Area
     col_chart, col_table = st.columns([1, 1.5])
     
