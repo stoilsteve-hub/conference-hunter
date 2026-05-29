@@ -9,10 +9,8 @@ class ImmunoOncologySpider(BaseSpider):
             browser = p.chromium.launch(headless=True)
             page = browser.new_page()
             try:
-                target_url = self.url.rstrip("/") + "/speaker-biographies"
-                page.goto(target_url, timeout=60000, wait_until="domcontentloaded")
-                
-                # Extract Date and Location from Title
+                # Visit homepage first to get the date and location
+                page.goto(self.url, timeout=60000, wait_until="networkidle")
                 conf_date = "TBD"
                 conf_loc = "TBD"
                 title = page.title()
@@ -22,6 +20,10 @@ class ImmunoOncologySpider(BaseSpider):
                         conf_date, conf_loc = date_loc.split(" in ", 1)
                     else:
                         conf_date = date_loc
+                
+                # Now go to speakers page
+                target_url = self.url.rstrip("/") + "/speaker-biographies"
+                page.goto(target_url, timeout=60000, wait_until="networkidle")
                 
                 # The names are inside strong tags. 
                 strongs = page.locator("p > strong, div > strong").all()

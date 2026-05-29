@@ -22,6 +22,12 @@ class GeneTherapySpider(BaseSpider):
                         conf_loc = parts[1].strip()
                         break
                 
+                if conf_date == "TBD":
+                    for line in page.locator("body").inner_text().split("\n")[:100]:
+                        if "Returning 20" in line:
+                            conf_date = line.strip()
+                            break
+                
                 # Get links
                 links = page.locator("a").all()
                 speaker_links = []
