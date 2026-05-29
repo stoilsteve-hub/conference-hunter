@@ -94,15 +94,15 @@ else:
     topics = ["All"] + sorted(df["Topic"].dropna().unique().tolist())
     selected_topic = st.sidebar.selectbox("Select Topic", topics)
     
-    companies = ["All"] + sorted(df["Company"].dropna().unique().tolist())
-    selected_company = st.sidebar.selectbox("Select Company", companies)
+    companies = sorted(df["Company"].dropna().unique().tolist())
+    selected_companies = st.sidebar.multiselect("Select Companies", companies, default=[])
     
     # Filter Data
     filtered_df = df.copy()
     if selected_topic != "All":
         filtered_df = filtered_df[filtered_df["Topic"] == selected_topic]
-    if selected_company != "All":
-        filtered_df = filtered_df[filtered_df["Company"] == selected_company]
+    if selected_companies:
+        filtered_df = filtered_df[filtered_df["Company"].isin(selected_companies)]
         
     # Key Metrics
     col1, col2, col3, col4 = st.columns(4)
