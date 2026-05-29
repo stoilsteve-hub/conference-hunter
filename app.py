@@ -70,7 +70,7 @@ st.title("🎯 Conference Hunter")
 st.markdown("---")
 
 # Load Data
-@st.cache_data
+@st.cache_data(ttl=3600)
 def load_data():
     file_path = "conference_data.xlsx"
     if not os.path.exists(file_path):
