@@ -29,7 +29,28 @@ class HansonWadeSpider(BaseSpider):
                             break
                 
                 # Now go to speakers page
-                speakers_url = self.speaker_url if self.speaker_url else self.url.rstrip("/") + "/speakers/"
+                speakers_url = self.speaker_url
+                if not speakers_url:
+                    # Dynamically discover speaker link from homepage
+                    page.goto(self.url, timeout=60000, wait_until="networkidle")
+                    links = page.locator("a").all()
+                    for a in links:
+                        try:
+                            text = a.inner_text().strip().lower()
+                            href = a.get_attribute("href")
+                            if "speaker" in text and href and href != "#" and "mailto:" not in href:
+                                if href.startswith("/"):
+                                    speakers_url = self.url.rstrip("/") + href
+                                else:
+                                    speakers_url = href
+                                if "/speaker" in speakers_url.lower():
+                                    break
+                        except Exception:
+                            pass
+                    
+                    if not speakers_url:
+                        speakers_url = self.url.rstrip("/") + "/speakers/"
+                
                 try:
                     response = page.goto(speakers_url, timeout=60000, wait_until="networkidle")
                     if response and response.status == 404:
