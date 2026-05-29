@@ -94,7 +94,7 @@ else:
     topics = ["All"] + sorted(df["Topic"].dropna().unique().tolist())
     selected_topic = st.sidebar.selectbox("Select Topic", topics)
     
-    companies = sorted(df["Company"].dropna().unique().tolist())
+    companies = sorted(df["Speaker Company"].dropna().unique().tolist())
     selected_companies = st.sidebar.multiselect("Select Companies", companies, default=[])
     
     # Filter Data
@@ -102,14 +102,14 @@ else:
     if selected_topic != "All":
         filtered_df = filtered_df[filtered_df["Topic"] == selected_topic]
     if selected_companies:
-        filtered_df = filtered_df[filtered_df["Company"].isin(selected_companies)]
+        filtered_df = filtered_df[filtered_df["Speaker Company"].isin(selected_companies)]
         
     # Key Metrics
     col1, col2, col3, col4 = st.columns(4)
     with col1:
         st.metric("Total Speakers", f"{len(filtered_df):,}")
     with col2:
-        st.metric("Unique Companies", f"{filtered_df['Company'].nunique():,}")
+        st.metric("Unique Companies", f"{filtered_df['Speaker Company'].nunique():,}")
     with col3:
         st.metric("Total Conferences", f"{filtered_df['Conference Name'].nunique():,}")
     with col4:
@@ -156,7 +156,7 @@ else:
     
     with col_chart:
         st.subheader("Top 10 Companies Represented")
-        top_companies = filtered_df["Company"].value_counts().head(10).reset_index()
+        top_companies = filtered_df["Speaker Company"].value_counts().head(10).reset_index()
         top_companies.columns = ["Company", "Count"]
         
         # Futuristic Bar Chart
