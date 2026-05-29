@@ -3,3 +3,7 @@ playwright
 pandas
 openpyxl
 requests
+streamlit
+plotly
+pandas
+openpyxl
