@@ -48,6 +48,22 @@ class ImmunoOncologySpider(BaseSpider):
                     # Extract bio text
                     data["Speaker Summary"] = "\n".join(lines[2:]) if len(lines) > 2 else ""
                     
+                    # Extract email
+                    import re
+                    email_pattern = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
+                    emails = re.findall(email_pattern, data["Speaker Summary"])
+                    if emails:
+                        data["Speaker Email"] = emails[0]
+                    else:
+                        # try looking for mailto links in the parent
+                        parent_element = s.evaluate_handle("node => node.parentNode.parentNode")
+                        if parent_element:
+                            for a_tag in parent_element.query_selector_all("a"):
+                                href = a_tag.get_attribute("href")
+                                if href and href.startswith("mailto:"):
+                                    data["Speaker Email"] = href.replace("mailto:", "").strip()
+                                    break
+                    
                     # Extract image
                     parent_element = s.evaluate_handle("node => node.parentNode.parentNode")
                     if parent_element:
@@ -59,7 +75,6 @@ class ImmunoOncologySpider(BaseSpider):
                                 if src.startswith("/"):
                                     src = "https://www.immuno-oncologyeurope.com" + src
                                 data["Speaker Image URL"] = src
-                                data["Speaker Image Local Path"] = self.download_image(src, name)
                     
                     results.append(data)
             except Exception as e:

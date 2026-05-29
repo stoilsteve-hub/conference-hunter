@@ -61,13 +61,26 @@ class LNPFormulationSpider(BaseSpider):
                                 bio_text.append(pt)
                         data["Speaker Summary"] = "\n\n".join(bio_text)
                         
+                        # Extract email
+                        import re
+                        email_pattern = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
+                        emails = re.findall(email_pattern, data["Speaker Summary"])
+                        if emails:
+                            data["Speaker Email"] = emails[0]
+                        else:
+                            # Try searching all hrefs for mailto
+                            for a_tag in page.locator("a").all():
+                                href = a_tag.get_attribute("href")
+                                if href and href.startswith("mailto:"):
+                                    data["Speaker Email"] = href.replace("mailto:", "").strip()
+                                    break
+                        
                         # Extract image
                         imgs = page.locator("img").all()
                         for img in imgs:
                             src = img.get_attribute("src")
                             if src and ("uploads" in src and "logo" not in src.lower() and "hw-group" not in src.lower()):
                                 data["Speaker Image URL"] = src
-                                data["Speaker Image Local Path"] = self.download_image(src, s["name"])
                                 break
                     except Exception as e:
                         print(f"Failed to deep scrape {s['url']}: {e}")

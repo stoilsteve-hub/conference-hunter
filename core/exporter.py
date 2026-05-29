@@ -9,7 +9,7 @@ class Exporter:
             "Conference ID", "Conference Name", "Topic", "Dates", "Location",
             "Speaker First Name", "Speaker Full Name", "Speaker Job Title",
             "Speaker Company", "Speaker Summary", "Speaker Profile",
-            "Speaker Image URL", "Speaker Image Local Path", "Speaker LinkedIn"
+            "Speaker Email", "Speaker Image URL", "Speaker LinkedIn"
         ]
 
     def save_data(self, new_data_list):
