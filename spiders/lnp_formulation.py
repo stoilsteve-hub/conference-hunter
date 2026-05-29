@@ -1,6 +1,5 @@
 from spiders.base_spider import BaseSpider
 from playwright.sync_api import sync_playwright
-import time
 
 class LNPFormulationSpider(BaseSpider):
     def extract(self):
@@ -11,17 +10,22 @@ class LNPFormulationSpider(BaseSpider):
             page = browser.new_page()
             try:
                 page.goto(self.url, timeout=60000)
-                time.sleep(3)
                 
-                speakers = page.locator(".speaker-name, h3").all()
-                for s in speakers[:5]:
-                    name = s.inner_text().strip()
-                    if name:
-                        data = self.data_template.copy()
-                        data["Conference Name"] = "LNP Formulation"
-                        data["Topic"] = "Pharma Formulation"
-                        data["Speaker Full Name"] = name
-                        results.append(data)
+                links = page.locator("a").all()
+                for link in links:
+                    href = str(link.get_attribute("href"))
+                    text = link.inner_text().strip()
+                    if "/speaker/" in href and "\n" in text:
+                        lines = text.split("\n")
+                        if len(lines) >= 3:
+                            data = self.data_template.copy()
+                            data["Conference Name"] = "LNP Formulation"
+                            data["Topic"] = "Pharma Formulation"
+                            data["Speaker Full Name"] = lines[0].strip()
+                            data["Speaker Job Title"] = lines[1].strip()
+                            data["Speaker Company"] = lines[2].strip()
+                            data["Speaker Profile"] = href
+                            results.append(data)
             except Exception as e:
                 print(f"Error on {self.url}: {e}")
             finally:

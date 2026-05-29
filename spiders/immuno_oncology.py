@@ -1,6 +1,5 @@
 from spiders.base_spider import BaseSpider
 from playwright.sync_api import sync_playwright
-import time
 
 class ImmunoOncologySpider(BaseSpider):
     def extract(self):
@@ -10,25 +9,46 @@ class ImmunoOncologySpider(BaseSpider):
             browser = p.chromium.launch(headless=True)
             page = browser.new_page()
             try:
-                # Cambridge Innovation sites usually have speaker bios at /speaker-biographies
                 target_url = self.url.rstrip("/") + "/speaker-biographies"
                 page.goto(target_url, timeout=60000)
-                time.sleep(3) # wait for dynamic load
                 
-                # Example of a heuristic extraction for CII sites
-                speakers = page.locator("div.speaker-bio, div.speaker, .speaker-box").all()
-                if not speakers:
-                     # fallback to any h3 or strong tag that might be a name
-                     speakers = page.locator("h3, strong").all()[:10] # limit to 10 for safety
+                # The names are inside strong tags. 
+                strongs = page.locator("p > strong, div > strong").all()
+                seen_names = set()
                 
-                for s in speakers:
-                    text = s.inner_text().strip()
-                    if text and len(text.split()) < 10: # likely a name
-                        data = self.data_template.copy()
-                        data["Conference Name"] = "Immuno-Oncology Europe"
-                        data["Topic"] = "Immuno-Oncology"
-                        data["Speaker Full Name"] = text.split("\n")[0]
-                        results.append(data)
+                for s in strongs:
+                    name = s.inner_text().strip()
+                    # Filter out garbage
+                    if name in ["Cookie Policy", "Warning!", "Filter by:", ""] or len(name.split()) < 2:
+                        continue
+                    
+                    if name in seen_names:
+                        continue # avoid duplicates
+                    seen_names.add(name)
+                    
+                    # Try to get the parent paragraph for context (title/company)
+                    parent_text = s.evaluate("node => node.parentNode.innerText")
+                    lines = [line.strip() for line in parent_text.split("\n") if line.strip()]
+                    
+                    data = self.data_template.copy()
+                    data["Conference Name"] = "Immuno-Oncology Europe"
+                    data["Topic"] = "Immuno-Oncology"
+                    data["Speaker Full Name"] = name
+                    
+                    # Lines usually look like:
+                    # Name, PhD
+                    # Job Title, Company
+                    # So we grab the next line after the name if it exists
+                    if len(lines) > 1:
+                        title_company = lines[1]
+                        if "," in title_company:
+                            parts = title_company.split(",", 1)
+                            data["Speaker Job Title"] = parts[0].strip()
+                            data["Speaker Company"] = parts[1].strip()
+                        else:
+                            data["Speaker Job Title"] = title_company
+                    
+                    results.append(data)
             except Exception as e:
                 print(f"Error on {self.url}: {e}")
             finally:
