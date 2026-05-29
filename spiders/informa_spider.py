@@ -37,13 +37,20 @@ class InformaSpider(BaseSpider):
                     email = "info@" + re.sub(r'[^a-zA-Z0-9]', '', company.lower()) + ".com" if company else ""
                     
                     data = {
-                        "Conference Name": self.conference_name,
-                        "Topic": self.topic,
-                        "Speaker": name,
-                        "Title": title,
-                        "Company": company,
-                        "Email": email
-                    }
+                    "Conference ID": self.conference_id,
+                    "Conference Name": self.conference_name,
+                    "Topic": self.topic,
+                    "Dates": "TBD",
+                    "Location": "TBD",
+                    "Speaker First Name": name.split()[0] if name else "",
+                    "Speaker Full Name": name,
+                    "Speaker Job Title": title,
+                    "Speaker Company": company,
+                    "Presentation Title": "",
+                    "Speaker Summary": "",
+                    "Speaker Profile": "",
+                    "Speaker Image URL": ""
+                }
                     extracted_data.append(data)
                         
                 browser.close()

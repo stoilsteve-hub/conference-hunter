@@ -1,4 +1,6 @@
 import hashlib
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from core.exporter import Exporter
 from spiders.immuno_oncology import ImmunoOncologySpider
 from spiders.hanson_wade_spider import HansonWadeSpider
@@ -174,9 +176,8 @@ class Engine:
 
     def run(self):
         print("Engine starting... gonna loop through urls now")
-        all_scraped_data = []
-        for url in self.urls:
-            print(f"Preparing to scrape {url}...")
+        
+        def scrape_url(url):
             spider_tuple = None
             for domain, spider_tup in self.spider_map.items():
                 if domain in url:
@@ -187,9 +188,20 @@ class Engine:
                 spider_class, conf_name, topic, speaker_url = spider_tuple
                 conf_id = "CONF-" + hashlib.md5(url.encode()).hexdigest()[:6].upper()
                 scraper = spider_class(conference_id=conf_id, conference_name=conf_name, topic=topic, url=url, speaker_url=speaker_url)
-                data = scraper.extract()
-                all_scraped_data.extend(data)
+                return scraper.extract()
             else:
                 print(f"No specific spider found for {url}, skipping!")
+                return []
+
+        all_scraped_data = []
+        with ThreadPoolExecutor(max_workers=20) as executor:
+            future_to_url = {executor.submit(scrape_url, url): url for url in self.urls}
+            for future in as_completed(future_to_url):
+                try:
+                    data = future.result()
+                    if data:
+                        all_scraped_data.extend(data)
+                except Exception as exc:
+                    print(f"URL generated an exception: {exc}")
         
-        self.exporter.export(all_scraped_data)
+        self.exporter.save_data(all_scraped_data)
