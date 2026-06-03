@@ -92,12 +92,34 @@ class HansonWadeSpider(BaseSpider):
                     if "/speaker/" in href and len(text) > 0:
                         lines = [l.strip() for l in text.split("\n") if l.strip()]
                         if len(lines) >= 1:
-                            speaker_links.append({
-                                "url": href,
-                                "name": lines[0].strip(),
-                                "title": lines[1].strip() if len(lines) > 1 else "",
-                                "company": lines[2].strip() if len(lines) > 2 else ""
-                            })
+                            first_line = lines[0]
+                            if "," not in first_line and len(lines) > 1:
+                                first_line = lines[0] + ", " + lines[1]
+                                lines.pop(1)
+                                    
+                            parts = [p.strip() for p in first_line.split(",")]
+                            name = parts[0]
+                            
+                            title = ""
+                            company = ""
+                            
+                            if len(parts) > 1:
+                                if parts[1] in ['PhD', 'MD', 'Ph.D.', 'M.D.', 'MSc', 'PharmD', 'MBA', 'M.S.', 'Ph.D']:
+                                    name += ", " + parts[1]
+                                    if len(parts) > 2:
+                                        title = ", ".join(parts[2:-1]) if len(parts) > 3 else parts[2]
+                                        company = parts[-1] if len(parts) > 3 else (parts[3] if len(parts)>3 else "")
+                                else:
+                                    title = parts[1]
+                                    company = ", ".join(parts[2:]) if len(parts) > 2 else ""
+                            
+                            if len(name) < 60:
+                                speaker_links.append({
+                                    "url": href,
+                                    "name": name,
+                                    "title": title,
+                                    "company": company
+                                })
                 
                 # deduplicate
                 unique_speakers = {s["name"]: s for s in speaker_links}.values()

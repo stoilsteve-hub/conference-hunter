@@ -27,17 +27,42 @@ class CHISpider(BaseSpider):
                         except:
                             pass
                             
-                    # Find any element that could be a speaker container
-                    locators = page.locator(".speaker, .speaker-item, [class*='speaker'], [class*='Speaker'], tr, div.row, li.nav-item").all()
+                    speaker_locators = page.locator(".speaker, .speaker-item, [class*='speaker'], [class*='Speaker'], tr, div.row, li.nav-item").all()
                     
-                    for loc in locators:
+                    for loc in speaker_locators:
                         try:
                             speaker_info = loc.evaluate('''el => {
-                                let img = el.querySelector('img');
-                                let text = el.innerText;
+                                // Exclude Wayback header, navs, and footers
+                                if (el.closest('#wm-ipp-base, header, footer, nav, .nav, .menu, .footer')) return null;
+                            
+                                let container = el.closest('.speaker, .speaker-item, .person, tr, li');
+                                if (!container) container = el; 
+                                
+                                // Prevent bleeding into hotel strings if it's too big
+                                let img = container.querySelector('img');
+                                let textNodes = [];
+                                
+                                let walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null, false);
+                                let node;
+                                while (node = walker.nextNode()) {
+                                    let txt = node.nodeValue.trim();
+                                    // Exclude agenda buttons or hotel texts
+                                    if (txt.length > 0 && !txt.includes('AgendaSponsor/Exhibit') && !txt.includes('Omni Boston') && !txt.includes('OVERVIEW | DOWNLOAD')) {
+                                        textNodes.push(txt);
+                                    }
+                                }
+                                
+                                let text = textNodes.join('\\n');
                                 if (!text || text.trim().length === 0) return null;
+                                
+                                // Exclude bad keywords
+                                let bad_words = ['About', 'Attend', 'Learn', 'Speak', 'Internet', 'Archive-It', 'Images'];
+                                for (let bw of bad_words) {
+                                    if (text.startsWith(bw + "\\n") || text === bw) return null;
+                                }
+                                
                                 return {
-                                    text: text.trim(),
+                                    text: text,
                                     img: img ? img.src : ""
                                 }
                             }''')
@@ -47,31 +72,37 @@ class CHISpider(BaseSpider):
                             text = speaker_info['text'].strip()
                             img = speaker_info['img']
                             
-                            if text in seen_texts: continue
                             if len(text) < 15 or len(text) > 800: continue
                             if text in seen_texts: continue
                             seen_texts.add(text)
                             
                             lines = [l.strip() for l in text.split('\n') if l.strip()]
-                            if len(lines) < 2 and not img: continue # skip garbage lines
+                            if len(lines) < 2 and not img: continue
                             
                             first_line = lines[0]
-                            # If first line doesn't have a comma, it's probably just the name
                             if "," not in first_line and len(lines) > 1:
                                 first_line = lines[0] + ", " + lines[1]
                                 lines.pop(1)
                                     
-                            parts = [p.strip() for p in first_line.split(",", 2)]
+                            parts = [p.strip() for p in first_line.split(",")]
                             name = parts[0]
-                            title = parts[1] if len(parts) > 1 else ""
-                            company = parts[2] if len(parts) > 2 else ""
+                            
+                            title = ""
+                            company = ""
+                            
+                            if len(parts) > 1:
+                                if parts[1] in ['PhD', 'MD', 'Ph.D.', 'M.D.', 'MSc', 'PharmD', 'MBA', 'M.S.', 'Ph.D']:
+                                    name += ", " + parts[1]
+                                    if len(parts) > 2:
+                                        title = ", ".join(parts[2:-1]) if len(parts) > 3 else parts[2]
+                                        company = parts[-1] if len(parts) > 3 else (parts[3] if len(parts)>3 else "")
+                                else:
+                                    title = parts[1]
+                                    company = ", ".join(parts[2:]) if len(parts) > 2 else ""
                             
                             summary = "\n".join(lines[1:]) if len(lines) > 1 else ""
                             
-                            # Sanity check: name shouldn't be too long
-                            if len(name) > 60: continue
-                            
-                            # Must have at least a title or company, or an image to be considered a speaker
+                            if len(name) > 60 or "Archived Content" in name: continue
                             if not title and not company and not img: continue
                             
                             data = {
