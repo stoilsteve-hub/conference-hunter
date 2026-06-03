@@ -59,20 +59,44 @@ class HansonWadeSpider(BaseSpider):
                 except Exception:
                     pass
                 
+                # Scroll to bottom to trigger any lazy loading
+                previous_height = page.evaluate("document.body.scrollHeight")
+                while True:
+                    page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+                    page.wait_for_timeout(1500)
+                    
+                    # Try to click any 'Load More' or 'View More' buttons
+                    try:
+                        more_btns = page.locator("button, a.button, .btn, .elementor-button").all()
+                        clicked_any = False
+                        for btn in more_btns:
+                            text = btn.inner_text().lower()
+                            if "more" in text or "load" in text:
+                                btn.click(timeout=2000)
+                                page.wait_for_timeout(1000)
+                                clicked_any = True
+                    except:
+                        pass
+                        
+                    new_height = page.evaluate("document.body.scrollHeight")
+                    if new_height == previous_height and not clicked_any:
+                        break
+                    previous_height = new_height
+                
                 # Get links
                 links = page.locator("a").all()
                 speaker_links = []
                 for link in links:
                     href = str(link.get_attribute("href"))
                     text = link.inner_text().strip()
-                    if "/speaker/" in href and "\n" in text:
-                        lines = text.split("\n")
-                        if len(lines) >= 3:
+                    if "/speaker/" in href and len(text) > 0:
+                        lines = [l.strip() for l in text.split("\n") if l.strip()]
+                        if len(lines) >= 1:
                             speaker_links.append({
                                 "url": href,
                                 "name": lines[0].strip(),
-                                "title": lines[1].strip(),
-                                "company": lines[2].strip()
+                                "title": lines[1].strip() if len(lines) > 1 else "",
+                                "company": lines[2].strip() if len(lines) > 2 else ""
                             })
                 
                 # deduplicate

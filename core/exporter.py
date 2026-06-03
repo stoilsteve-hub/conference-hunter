@@ -59,13 +59,25 @@ class Exporter:
         return loc
 
     def save_data(self, new_data_list):
+        if not new_data_list:
+            return 0
+            
+        new_df = pd.DataFrame(new_data_list, columns=self.columns)
+        
         # check if file exists, if not create new dataframe
         if os.path.exists(self.output_file):
             df = pd.read_excel(self.output_file)
-            new_df = pd.DataFrame(new_data_list, columns=self.columns)
-            df = pd.concat([df, new_df], ignore_index=True)
+            before_len = len(df)
+            combined = pd.concat([df, new_df], ignore_index=True)
+            # Drop duplicates keeping the first occurrence (which would be the existing one if it exists)
+            # or keep the last to overwrite with fresh data. Let's keep last to update with new rich data
+            combined.drop_duplicates(subset=['Speaker Full Name', 'Conference Name'], keep='last', inplace=True)
+            after_len = len(combined)
+            new_added = after_len - before_len
+            df = combined
         else:
-            df = pd.DataFrame(new_data_list, columns=self.columns)
+            df = new_df
+            new_added = len(df)
             
         # Standardize Dates and Locations
         for i, row in df.iterrows():
@@ -79,4 +91,5 @@ class Exporter:
             df.at[i, 'Location'] = self._standardize_location(raw_loc)
         
         df.to_excel(self.output_file, index=False)
-        print(f"Data saved to {self.output_file}! yey")
+        print(f"Data saved to {self.output_file}! {new_added} NEW speakers added.")
+        return new_added

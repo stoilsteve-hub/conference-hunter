@@ -167,6 +167,63 @@ class Engine:
             "discoveryontarget.com": (CHISpider, "Discovery on Target 2023", "Both", "https://www.discoveryontarget.com/"),
             "immunogenicitysummit.com": (CHISpider, "Immunogenicity & Bioassay Summit - Immunogenicity Prediction and Control", "Both", "https://www.immunogenicitysummit.com/22/immunogenicity-prediction"),
             "web.archive.org": (InformaSpider, "BPI 2022", "Both", "http://web.archive.org/web/20220711180806/https://informaconnect.com/bioprocessinternational/speakers/"),
+            "https://informaconnect.com/bioprocessinternational/speakers/": (InformaSpider, "BioProcess International 2024", "Both", "https://informaconnect.com/bioprocessinternational/speakers/"),
+            "https://www.bioprocessingsummit.com/Streams/Cell-Therapy": (CHISpider, "16th Annual Bioprocessing Summit", "Both", "https://www.bioprocessingsummit.com/Streams/Cell-Therapy"),
+            "https://www.pegsummit.com/": (CHISpider, "Pegs Boston CAR-T, TCRs and TILs", "Both", "https://www.pegsummit.com/"),
+            "https://www.pegsummit.com/In-vivo-engineering": (CHISpider, "Cambridge Healthtech Institute's 3rd Annual In vivo Cell and Gene Engineering", "Both", "https://www.pegsummit.com/In-vivo-engineering"),
+            "https://www.pegsummit.com/cell-based-immunotherapies#2": (CHISpider, "Cambridge Healthtech Institute's 11th Annual Cell-Based Immunotherapies", "Both", "https://www.pegsummit.com/cell-based-immunotherapies#2"),
+            "https://www.immuno-oncologyeurope.com/": (CHISpider, "Cambridge Healthtech Institute's 8th Annual Next Generation Cell-Based Therapies", "Both", "https://www.immuno-oncologyeurope.com/"),
+            "https://allogeneic-cell-therapies-europe.com/": (CHISpider, "3rd Allogeneic Cell Therapies Summit Europe", "Both", "https://allogeneic-cell-therapies-europe.com/"),
+            "https://www.discoveryontarget.com/": (CHISpider, "Discovery on Target 2023", "Both", "https://www.discoveryontarget.com/"),
+            "https://www.pegsummit.com/": (CHISpider, "PEGS Boston Conference & Expo", "Both", "https://www.pegsummit.com/"),
+            "https://informaconnect.com/bpieurope/speakers/": (InformaSpider, "BPI Europe 2023 (Bioprocess International)", "Both", "https://informaconnect.com/bpieurope/speakers/"),
+            "https://www.immunogenicitysummit.com/22/immunogenicity-prediction": (CHISpider, "Immunogenicity & Bioassay Summit - Immunogenicity Prediction and Control", "Both", "https://www.immunogenicitysummit.com/22/immunogenicity-prediction"),
+            "https://www.immunogenicitysummit.com/22/bioassays-for-biologics": (CHISpider, "Immunogenicity & Bioassay Summit - Optimizing Bioassays for Biologics", "Both", "https://www.immunogenicitysummit.com/22/bioassays-for-biologics"),
+            "https://www.immunogenicitysummit.com/22/immunogenicity-assessment-Clinical-Relevance": (CHISpider, "Immunogenicity & Bioassay Summit - Immunogenicity Assessment & Clinical Relevance", "Both", "https://www.immunogenicitysummit.com/22/immunogenicity-assessment-Clinical-Relevance"),
+            "https://www.immunogenicitysummit.com/22/Immunology-for-Biotherapeutics": (CHISpider, "Immunogenicity & Bioassay Summit - Immunology for Biotherapeutics", "Both", "https://www.immunogenicitysummit.com/22/Immunology-for-Biotherapeutics"),
+            "http://web.archive.org/web/20220711180806/https://informaconnect.com/bioprocessinternational/speakers/": (InformaSpider, "BPI 2022", "Both", "http://web.archive.org/web/20220711180806/https://informaconnect.com/bioprocessinternational/speakers/"),
+            "https://www.bioprocessingsummit.com/22/cell-culture": (CHISpider, "Annual Bioprocessing Summit Boston 2022", "Both", "https://www.bioprocessingsummit.com/22/cell-culture"),
+            "https://www.bioprocessingsummit.com/22/bioproduction": (CHISpider, "Annual Bioprocessing Summit Boston 2022", "Both", "https://www.bioprocessingsummit.com/22/bioproduction"),
+            "https://www.bioprocessingsummit.com/22/continuous-processing": (CHISpider, "Annual Bioprocessing Summit Boston 2022", "Both", "https://www.bioprocessingsummit.com/22/continuous-processing"),
+            "https://www.bioprocessingsummit.com/22/purification-and-recovery": (CHISpider, "Annual Bioprocessing Summit Boston 2022", "Both", "https://www.bioprocessingsummit.com/22/purification-and-recovery"),
+            "https://www.bioprocessingsummit.com/22/gene-therapy-cmc": (CHISpider, "Annual Bioprocessing Summit Boston 2022", "Both", "https://www.bioprocessingsummit.com/22/gene-therapy-cmc"),
+            "https://www.bioprocessingsummit.com/22/gene-therapy-manufacturing": (CHISpider, "Annual Bioprocessing Summit Boston 2022", "Both", "https://www.bioprocessingsummit.com/22/gene-therapy-manufacturing"),
+            "https://www.bioprocessingsummit.com/22/cell-therapy-cmc": (CHISpider, "Annual Bioprocessing Summit Boston 2022", "Both", "https://www.bioprocessingsummit.com/22/cell-therapy-cmc"),
+            "https://www.bioprocessingsummit.com/22/host-cell-proteins": (CHISpider, "Annual Bioprocessing Summit Boston 2022", "Both", "https://www.bioprocessingsummit.com/22/host-cell-proteins"),
+            "https://www.bioprocessingsummit.com/22/preclinical-analytical-development": (CHISpider, "Annual Bioprocessing Summit Boston 2022", "Both", "https://www.bioprocessingsummit.com/22/preclinical-analytical-development"),
+            "https://www.bioprocessingsummit.com/22/stability-biologics": (CHISpider, "Annual Bioprocessing Summit Boston 2022", "Both", "https://www.bioprocessingsummit.com/22/stability-biologics"),
+            "https://www.bioprocessingsummit.com/22/formulation-and-delivery-of-biologics": (CHISpider, "Annual Bioprocessing Summit Boston 2022", "Both", "https://www.bioprocessingsummit.com/22/formulation-and-delivery-of-biologics"),
+            "https://www.bioprocessingsummit.com/22/vaccine-manufacturing": (CHISpider, "Annual Bioprocessing Summit Boston 2022", "Both", "https://www.bioprocessingsummit.com/22/vaccine-manufacturing"),
+            "https://www.immunogenicitysummit.com/21/immunogenicity-prediction": (CHISpider, "Immunogenicity & Bioassay Summit - Immunogenicity Prediction and Control", "Both", "https://www.immunogenicitysummit.com/21/immunogenicity-prediction"),
+            "https://www.immunogenicitysummit.com/21/Bioassays-for-Biologics": (CHISpider, "Immunogenicity & Bioassay Summit - Optimizing Bioassays for Biologics", "Both", "https://www.immunogenicitysummit.com/21/Bioassays-for-Biologics"),
+            "https://www.immunogenicitysummit.com/21/Immunogenicity-Assessment-Clinical-Relevance": (CHISpider, "Immunogenicity & Bioassay Summit - Immunogenicity Assessment & Clinical Relevance", "Both", "https://www.immunogenicitysummit.com/21/Immunogenicity-Assessment-Clinical-Relevance"),
+            "https://www.immunogenicitysummit.com/21/Immunology-for-Biotherapeutics": (CHISpider, "Immunogenicity & Bioassay Summit - Immunology for Biotherapeutics", "Both", "https://www.immunogenicitysummit.com/21/Immunology-for-Biotherapeutics"),
+            "http://web.archive.org/web/20210619002826/https://informaconnect.com/bioprocessinternational/speakers/": (InformaSpider, "BPI 2021", "Both", "http://web.archive.org/web/20210619002826/https://informaconnect.com/bioprocessinternational/speakers/"),
+            "http://web.archive.org/web/20220119235400/https://informaconnect.com/bpieurope/speakers/": (InformaSpider, "BPI Europe 2021", "Both", "http://web.archive.org/web/20220119235400/https://informaconnect.com/bpieurope/speakers/"),
+            "https://www.bioprocessingeurope.com/21/cell-culture#Day2": (CHISpider, "Bioprocessing summit 2021 - Cell Culture and Bioproduction", "Both", "https://www.bioprocessingeurope.com/21/cell-culture#Day2"),
+            "https://www.bioprocessingeurope.com/21/continuous-processing": (CHISpider, "Bioprocessing summit 2021 - Downstream Processing and Continuous Processing", "Both", "https://www.bioprocessingeurope.com/21/continuous-processing"),
+            "https://www.bioprocessingeurope.com/21/analytical-characterisation": (CHISpider, "Bioprocessing summit 2021 - Analytical Characterisation and Formulation", "Both", "https://www.bioprocessingeurope.com/21/analytical-characterisation"),
+            "https://www.immunogenicitysummit.com/20/Immunogenicity-Assessment-Clinical-Relevance": (CHISpider, "Immunogenicity & Bioassay Summit - Immunogenicity Assessment & Clinical Relevance", "Both", "https://www.immunogenicitysummit.com/20/Immunogenicity-Assessment-Clinical-Relevance"),
+            "https://www.immunogenicitysummit.com/20/immunogenicity-prediction": (CHISpider, "Immunogenicity & Bioassay Summit - Immunogenicity Prediction and Control", "Both", "https://www.immunogenicitysummit.com/20/immunogenicity-prediction"),
+            "https://www.immunogenicitysummit.com/20/Bioassays-for-Biologics": (CHISpider, "Immunogenicity & Bioassay Summit - Optimizing Bioassays for Biologics", "Both", "https://www.immunogenicitysummit.com/20/Bioassays-for-Biologics"),
+            "http://web.archive.org/web/20200806181949/https://informaconnect.com/bioprocessinternational/speakers/": (InformaSpider, "BPI 2020", "Both", "http://web.archive.org/web/20200806181949/https://informaconnect.com/bioprocessinternational/speakers/"),
+            "https://www.bioprocessingeurope.com/20/cell-culture": (CHISpider, "Bioprocessing summit 2020 - Cell Culture to Bioproduction", "Both", "https://www.bioprocessingeurope.com/20/cell-culture"),
+            "https://www.bioprocessingeurope.com/20/cell-line-development": (CHISpider, "Bioprocessing summit 2020 - Cell Line Development to Protein Expression", "Both", "https://www.bioprocessingeurope.com/20/cell-line-development"),
+            "https://www.bioprocessingeurope.com/20/continuous-processing": (CHISpider, "Bioprocessing summit 2020 - Continuous Processing for Biopharmaceuticals", "Both", "https://www.bioprocessingeurope.com/20/continuous-processing"),
+            "https://www.bioprocessingeurope.com/20/purification": (CHISpider, "Bioprocessing summit 2020 - Advances in Recovery and Purification", "Both", "https://www.bioprocessingeurope.com/20/purification"),
+            "https://www.bioprocessingeurope.com/20/cell-therapy": (CHISpider, "Bioprocessing summit 2020 - Cell Therapy CMC and Manufacturing", "Both", "https://www.bioprocessingeurope.com/20/cell-therapy"),
+            "https://www.bioprocessingeurope.com/20/gene-therapy": (CHISpider, "Bioprocessing summit 2020 - Gene Therapy CMC and Manufacturing", "Both", "https://www.bioprocessingeurope.com/20/gene-therapy"),
+            "https://www.bioprocessingeurope.com/20/analytical-characterisation": (CHISpider, "Bioprocessing summit 2020 - Analytical Characterisation", "Both", "https://www.bioprocessingeurope.com/20/analytical-characterisation"),
+            "https://www.bioprocessingeurope.com/20/formulation": (CHISpider, "Bioprocessing summit 2020 - Formulation, Stability & Aggregation", "Both", "https://www.bioprocessingeurope.com/20/formulation"),
+            "http://web.archive.org/web/20210302033734/https://informaconnect.com/bpieurope/speakers/": (InformaSpider, "BPI Europe 2020", "Both", "http://web.archive.org/web/20210302033734/https://informaconnect.com/bpieurope/speakers/"),
+            "https://www.immunogenicitysummit.com/19/Immunogenicity-Assessment-Clinical-Relevance": (CHISpider, "Immunogenicity & Bioassay Summit - Immunogenicity Assessment & Clinical Relevance", "Both", "https://www.immunogenicitysummit.com/19/Immunogenicity-Assessment-Clinical-Relevance"),
+            "https://www.immunogenicitysummit.com/19/immunogenicity-prediction": (CHISpider, "Immunogenicity & Bioassay Summit - Immunogenicity Prediction and Control", "Both", "https://www.immunogenicitysummit.com/19/immunogenicity-prediction"),
+            "https://www.immunogenicitysummit.com/19/Bioassays-for-Biologics": (CHISpider, "Immunogenicity & Bioassay Summit - Optimizing Bioassays for Biologics", "Both", "https://www.immunogenicitysummit.com/19/Bioassays-for-Biologics"),
+            "https://www.immunogenicitysummit.com/19/Training-Immunology-for-Biotechnology": (CHISpider, "Immunogenicity & Bioassay Summit - Immunology for Biotherapeutics", "Both", "https://www.immunogenicitysummit.com/19/Training-Immunology-for-Biotechnology"),
+            "https://www.immunogenicitysummit.com/18/Immunogenicity-Assessment-Clinical-Relevance": (CHISpider, "Immunogenicity & Bioassay Summit - Immunogenicity Assessment & Clinical Relevance", "Both", "https://www.immunogenicitysummit.com/18/Immunogenicity-Assessment-Clinical-Relevance"),
+            "https://www.immunogenicitysummit.com/18/immunogenicity-prediction": (CHISpider, "Immunogenicity & Bioassay Summit - Immunogenicity Prediction and Control", "Both", "https://www.immunogenicitysummit.com/18/immunogenicity-prediction"),
+            "https://www.immunogenicitysummit.com/18/Bioassays-for-Biologics": (CHISpider, "Immunogenicity & Bioassay Summit - Optimizing Bioassays for Biologics", "Both", "https://www.immunogenicitysummit.com/18/Bioassays-for-Biologics"),
+            "https://www.immunogenicitysummit.com/18/Training-Immunology-for-Biotechnology": (CHISpider, "Immunogenicity & Bioassay Summit - Immunology for Biotherapeutics", "Both", "https://www.immunogenicitysummit.com/18/Training-Immunology-for-Biotechnology"),
             "bioprocessingeurope.com": (CHISpider, "Bioprocessing summit 2021 - Cell Culture and Bioproduction", "Both", "https://www.bioprocessingeurope.com/21/cell-culture#Day2"),
         }
 
@@ -205,11 +262,12 @@ class Engine:
         ]
 
         def scrape_url(url):
-            spider_tuple = None
-            for domain, spider_tup in self.spider_map.items():
-                if domain in url:
-                    spider_tuple = spider_tup
-                    break
+            spider_tuple = self.spider_map.get(url)
+            if not spider_tuple:
+                for key, spider_tup in self.spider_map.items():
+                    if key in url:
+                        spider_tuple = spider_tup
+                        break
             
             if spider_tuple:
                 spider_class, conf_name, topic, speaker_url = spider_tuple
@@ -228,6 +286,7 @@ class Engine:
                 return []
 
         all_scraped_data = []
+        total_new_added = 0
         import time
         from concurrent.futures import ThreadPoolExecutor, as_completed
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
@@ -240,7 +299,8 @@ class Engine:
                         
                         # Save incrementally
                         if len(all_scraped_data) > 0:
-                            self.exporter.save_data(all_scraped_data)
+                            added = self.exporter.save_data(all_scraped_data)
+                            total_new_added += added
                             all_scraped_data = [] # Reset after saving
                     
                     # Add delay if running sequentially to avoid bot blocks
@@ -250,4 +310,8 @@ class Engine:
                     url = future_to_url[future]
                     print(f"URL generated an exception: {e}")
         
-        self.exporter.save_data(all_scraped_data)
+        if all_scraped_data:
+            added = self.exporter.save_data(all_scraped_data)
+            total_new_added += added
+            
+        print(f"Bot finished! Added a total of {total_new_added} NEW speakers to the database.")
