@@ -104,7 +104,7 @@ class HansonWadeSpider(BaseSpider):
                             company = ""
                             
                             if len(parts) > 1:
-                                if parts[1] in ['PhD', 'MD', 'Ph.D.', 'M.D.', 'MSc', 'PharmD', 'MBA', 'M.S.', 'Ph.D']:
+                                if parts[1].upper() in ['PHD', 'MD', 'PH.D.', 'M.D.', 'MSC', 'PHARMD', 'MBA', 'M.S.']:
                                     name += ", " + parts[1]
                                     if len(parts) > 2:
                                         title = ", ".join(parts[2:-1]) if len(parts) > 3 else parts[2]
@@ -112,8 +112,15 @@ class HansonWadeSpider(BaseSpider):
                                 else:
                                     title = parts[1]
                                     company = ", ".join(parts[2:]) if len(parts) > 2 else ""
+                                    
+                            company_indicators = ['klinikum', 'universität', 'university', 'biochemie', 'kgaa', 'inc', 'llc', 'ltd', 'therapeutics', 'biosciences', 'pharma', 'institute', 'gmbh', 'ag', 'corp', 'hospital', 'college', 'clinic']
+                            title_indicators = ['director', 'vp', 'head', 'scientist', 'manager', 'officer', 'chief', 'professor', 'ceo', 'cto', 'lead', 'founder', 'president']
+                            if company.strip() == '':
+                                if any(ci in title.lower() for ci in company_indicators) and not any(ti in title.lower() for ti in title_indicators):
+                                    company = title
+                                    title = ""
                             
-                            if len(name) < 60:
+                            if len(name) < 60 and not any(char.isdigit() for char in name) and "speaker" not in name.lower() and "expand_more" not in title.lower() and "@" not in title:
                                 speaker_links.append({
                                     "url": href,
                                     "name": name,

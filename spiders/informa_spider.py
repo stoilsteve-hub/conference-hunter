@@ -120,7 +120,7 @@ class InformaSpider(BaseSpider):
                 company = ""
                 
                 if len(parts) > 1:
-                    if parts[1] in ['PhD', 'MD', 'Ph.D.', 'M.D.', 'MSc', 'PharmD', 'MBA', 'M.S.', 'Ph.D']:
+                    if parts[1].upper() in ['PHD', 'MD', 'PH.D.', 'M.D.', 'MSC', 'PHARMD', 'MBA', 'M.S.']:
                         name += ", " + parts[1]
                         if len(parts) > 2:
                             title = ", ".join(parts[2:-1]) if len(parts) > 3 else parts[2]
@@ -128,10 +128,33 @@ class InformaSpider(BaseSpider):
                     else:
                         title = parts[1]
                         company = ", ".join(parts[2:]) if len(parts) > 2 else ""
+                        
+                company_indicators = ['klinikum', 'universität', 'university', 'biochemie', 'kgaa', 'inc', 'llc', 'ltd', 'therapeutics', 'biosciences', 'pharma', 'institute', 'gmbh', 'ag', 'corp', 'hospital', 'college', 'clinic']
+                title_indicators = ['director', 'vp', 'head', 'scientist', 'manager', 'officer', 'chief', 'professor', 'ceo', 'cto', 'lead', 'founder', 'president']
+                if company.strip() == '':
+                    if any(ci in title.lower() for ci in company_indicators) and not any(ti in title.lower() for ti in title_indicators):
+                        company = title
+                        title = ""
+                        
+                dept_keywords = ['development', 'research', 'chemistry', 'operations', 'lab', 'strategy', 'manufacturing', 'controls', 'platform', 'immunology', 'discovery', 'sciences', 'biology', 'engineering', 'analytics', 'regulatory', 'access', 'value', 'project', 'team', 'biochemistry', 'oncology', 'medical affairs', 'clinical', 'data', 'bioinformatics', 'computational', 'formulation', 'delivery', 'cmc', 'quality', 'assurance', 'qc', 'qa', 'market', 'commercial', 'sales', 'marketing', 'business', 'alliance', 'search', 'evaluation', 'innovation', 'technology']
+                company_keywords_ext = company_indicators + ['biotech', 'solutions', 'health', 'care', 'sanofi', 'pfizer', 'novartis', 'merck', 'janssen', 'astrazeneca', 'roche', 'abbvie', 'bayer', 'lilly', 'gsk', 'amgen', 'gilead', 'biogen', 'regeneron', 'vertex', 'moderna', 'biontech', 'takeda', 'daiichi', 'astellas', 'eisai', 'otsuka', 'sun', 'reddy', 'cipla', 'aurobindo', 'lupin', 'zydus', 'intas', 'torrent', 'biocon', 'glenmark', 'macleods', 'mankind', 'alchem', 'usv', 'wockhardt', 'group', 'partner', 'consulting', 'association', 'society', 'council', 'network', 'fund', 'foundation', 'ventures', 'capital', 'holdings', 'partners']
+                
+                if company.strip() != '':
+                    c_lower = company.lower()
+                    if not any(k in c_lower for k in company_keywords_ext):
+                        if any(dk in c_lower for dk in dept_keywords) and 'national research council' not in c_lower:
+                            title = title + ", " + company if title else company
+                            company = ""
                 
                 summary = "\n".join(lines[1:]) if len(lines) > 1 else ""
                 
-                if len(name) > 60 or "Archived Content" in name: continue
+                if summary.lower().startswith('job title:'):
+                    summary = summary[10:].strip()
+                if 'wayback machine' in summary.lower() or 'fight for the future' in summary.lower():
+                    summary = ''
+                    
+                if len(name) > 60 or "Archived Content" in name or any(char.isdigit() for char in name): continue
+                if "speaker" in name.lower() or "expand_more" in title.lower() or "@" in title or "bpicustomerservice" in title.lower(): continue
                 if not title and not company and not img: continue
                 
                 data = {
