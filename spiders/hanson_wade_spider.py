@@ -8,9 +8,14 @@ class HansonWadeSpider(BaseSpider):
         print(f"Scraping {self.conference_name} at {self.url}")
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
-            page = browser.new_page()
+            context = browser.new_context(ignore_https_errors=True)
+            page = context.new_page()
             try:
-                page.goto(self.url, timeout=60000, wait_until="domcontentloaded")
+                if not self.speaker_url:
+                    target_url = self.url if self.url.startswith("http") else f"https://{self.url}"
+                else:
+                    target_url = self.speaker_url
+                page.goto(target_url, timeout=60000, wait_until="domcontentloaded")
                 
                 # Extract Date and Location
                 conf_date = "TBD"
@@ -160,7 +165,11 @@ class HansonWadeSpider(BaseSpider):
                     data["Speaker Profile"] = s["url"]
                     
                     try:
-                        page.goto(s["url"], timeout=30000, wait_until="domcontentloaded")
+                        live_url = re.sub(r'^https?://web\.archive\.org/web/\d+/', '', s["url"])
+                        # Playwright is launched at the top of the file, but we need to create a new context to ignore https errors
+                        # Actually, wait. We can just use the existing page since it's already created. But the context needs ignore_https_errors.
+                        # I'll just change the deep scrape to hit live_url
+                        page.goto(live_url, timeout=5000, wait_until="domcontentloaded")
                         
                         # Extract presentation topic
                         text = page.locator("body").inner_text()
@@ -201,7 +210,6 @@ class HansonWadeSpider(BaseSpider):
                             return False
 
                         # Extract email
-                        import re
                         email_pattern = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
                         potential_emails = []
                         potential_emails.extend(re.findall(email_pattern, data["Speaker Summary"]))

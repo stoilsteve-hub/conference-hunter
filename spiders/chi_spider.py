@@ -5,11 +5,20 @@ from spiders.base_spider import BaseSpider
 class CHISpider(BaseSpider):
     def extract(self):
         print(f"Extracting CHI format from {self.url}...")
+        import time
+        import random
         extracted_data = []
-        try:
-            with sync_playwright() as p:
+        max_retries = 5
+        for attempt in range(max_retries):
+            try:
+                p = sync_playwright().start()
                 browser = p.chromium.launch()
-                page = browser.new_page()
+                user_agents = [
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.5 Safari/605.1.15",
+                    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36"
+                ]
+                page = browser.new_page(user_agent=random.choice(user_agents))
                 page.goto(self.url, timeout=60000, wait_until="networkidle")
 
                 # Find and click any Day tabs to load all speakers
@@ -162,7 +171,14 @@ class CHISpider(BaseSpider):
                             pass
 
                 browser.close()
-        except Exception as e:
-            print(f"Error scraping {self.url}: {e}")
+                p.stop()
+                break # Success!
+            except Exception as e:
+                if 'p' in locals(): p.stop()
+                print(f"Error scraping {self.url} on attempt {attempt+1}: {e}")
+                if attempt < max_retries - 1:
+                    sleep_time = 15 * (2 ** attempt) + random.uniform(1, 5)
+                    print(f"Sleeping for {sleep_time:.2f} seconds before retry...")
+                    time.sleep(sleep_time)
             
         return extracted_data

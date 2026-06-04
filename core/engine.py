@@ -289,6 +289,7 @@ class Engine:
         total_new_added = 0
         import time
         from concurrent.futures import ThreadPoolExecutor, as_completed
+        max_workers = 1 # Force sequential to avoid IP bans
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             future_to_url = {executor.submit(scrape_url, url): url for url in self.urls}
             for future in as_completed(future_to_url):
@@ -303,9 +304,9 @@ class Engine:
                             total_new_added += added
                             all_scraped_data = [] # Reset after saving
                     
-                    # Add delay if running sequentially to avoid bot blocks
-                    if max_workers == 1:
-                        time.sleep(2)
+                    # Mandatory delay to avoid bot blocks
+                    print("Sleeping 7 seconds before hitting next domain...")
+                    time.sleep(7)
                 except Exception as e:
                     url = future_to_url[future]
                     print(f"URL generated an exception: {e}")
