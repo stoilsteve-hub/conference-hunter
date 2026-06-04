@@ -115,7 +115,7 @@ class CHISpider(BaseSpider):
                                 if not any(k in c_lower for k in company_keywords_ext):
                                     if any(dk in c_lower for dk in dept_keywords) and 'national research council' not in c_lower:
                                         title = title + ", " + company if title else company
-                            company = ""
+                                        company = ""
                             
                             summary = "\n".join(lines[1:]) if len(lines) > 1 else ""
                             
@@ -123,6 +123,20 @@ class CHISpider(BaseSpider):
                                 summary = summary[10:].strip()
                             if 'wayback machine' in summary.lower() or 'fight for the future' in summary.lower():
                                 summary = ''
+                                
+                            # Global PhD/MD scrubber
+                            degree_pattern = r'(?i)\b(Ph\.?D\.?|M\.?D\.?|MSc|PharmD|MBA|M\.?S\.?)\b'
+                            degrees_found = []
+                            for field in [title, company]:
+                                matches = re.findall(degree_pattern, field)
+                                for match in matches:
+                                    if match.upper().replace('.', '') not in [d.upper().replace('.', '') for d in degrees_found]:
+                                        degrees_found.append(match)
+                            
+                            if degrees_found:
+                                name += ", " + ", ".join(degrees_found)
+                                title = re.sub(degree_pattern, '', title).strip(' ,')
+                                company = re.sub(degree_pattern, '', company).strip(' ,')
                                 
                             if len(name) > 60 or "Archived Content" in name or any(char.isdigit() for char in name): continue
                             if "speaker" in name.lower() or "expand_more" in title.lower() or "@" in title or "bpicustomerservice" in title.lower(): continue
@@ -140,7 +154,7 @@ class CHISpider(BaseSpider):
                                 "Speaker Company": company,
                                 "Presentation Title": "",
                                 "Speaker Summary": summary,
-                                "Speaker Profile": summary,
+                                "Speaker Profile": "",
                                 "Speaker Image URL": img
                             }
                             extracted_data.append(data)

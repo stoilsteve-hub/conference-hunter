@@ -1,3 +1,4 @@
+import re
 from spiders.base_spider import BaseSpider
 from playwright.sync_api import sync_playwright
 
@@ -119,6 +120,20 @@ class HansonWadeSpider(BaseSpider):
                                 if any(ci in title.lower() for ci in company_indicators) and not any(ti in title.lower() for ti in title_indicators):
                                     company = title
                                     title = ""
+                                    
+                            # Global PhD/MD scrubber
+                            degree_pattern = r'(?i)\b(Ph\.?D\.?|M\.?D\.?|MSc|PharmD|MBA|M\.?S\.?)\b'
+                            degrees_found = []
+                            for field in [title, company]:
+                                matches = re.findall(degree_pattern, field)
+                                for match in matches:
+                                    if match.upper().replace('.', '') not in [d.upper().replace('.', '') for d in degrees_found]:
+                                        degrees_found.append(match)
+                            
+                            if degrees_found:
+                                name += ", " + ", ".join(degrees_found)
+                                title = re.sub(degree_pattern, '', title).strip(' ,')
+                                company = re.sub(degree_pattern, '', company).strip(' ,')
                             
                             if len(name) < 60 and not any(char.isdigit() for char in name) and "speaker" not in name.lower() and "expand_more" not in title.lower() and "@" not in title:
                                 speaker_links.append({

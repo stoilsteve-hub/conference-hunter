@@ -153,6 +153,20 @@ class InformaSpider(BaseSpider):
                 if 'wayback machine' in summary.lower() or 'fight for the future' in summary.lower():
                     summary = ''
                     
+                # Global PhD/MD scrubber
+                degree_pattern = r'(?i)\b(Ph\.?D\.?|M\.?D\.?|MSc|PharmD|MBA|M\.?S\.?)\b'
+                degrees_found = []
+                for field in [title, company]:
+                    matches = re.findall(degree_pattern, field)
+                    for match in matches:
+                        if match.upper().replace('.', '') not in [d.upper().replace('.', '') for d in degrees_found]:
+                            degrees_found.append(match)
+                
+                if degrees_found:
+                    name += ", " + ", ".join(degrees_found)
+                    title = re.sub(degree_pattern, '', title).strip(' ,')
+                    company = re.sub(degree_pattern, '', company).strip(' ,')
+                    
                 if len(name) > 60 or "Archived Content" in name or any(char.isdigit() for char in name): continue
                 if "speaker" in name.lower() or "expand_more" in title.lower() or "@" in title or "bpicustomerservice" in title.lower(): continue
                 if not title and not company and not img: continue
@@ -169,7 +183,7 @@ class InformaSpider(BaseSpider):
                     "Speaker Company": company,
                     "Presentation Title": "",
                     "Speaker Summary": summary,
-                    "Speaker Profile": summary,
+                    "Speaker Profile": "",
                     "Speaker Image URL": img
                 }
                 extracted_data.append(data)
