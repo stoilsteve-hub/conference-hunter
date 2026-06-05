@@ -7,3 +7,5 @@ streamlit
 plotly
 pandas
 openpyxl
+google-genai
+python-dotenv

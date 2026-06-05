@@ -1,7 +1,7 @@
 import re
 from spiders.base_spider import BaseSpider
 from playwright.sync_api import sync_playwright
-
+from core.ai_extractor import extract_speaker_info
 class HansonWadeSpider(BaseSpider):
     def extract(self):
         results = []
@@ -165,36 +165,20 @@ class HansonWadeSpider(BaseSpider):
                     data["Speaker Profile"] = s["url"]
                     
                     try:
-                        live_url = re.sub(r'^https?://web\.archive\.org/web/\d+/', '', s["url"])
-                        # Playwright is launched at the top of the file, but we need to create a new context to ignore https errors
-                        # Actually, wait. We can just use the existing page since it's already created. But the context needs ignore_https_errors.
-                        # I'll just change the deep scrape to hit live_url
-                        page.goto(live_url, timeout=5000, wait_until="domcontentloaded")
+                        # Use the original URL (even if it's a Wayback Machine archive) so we don't hit dead live domains!
+                        page.goto(s["url"], timeout=15000, wait_until="domcontentloaded")
                         
-                        # Extract presentation topic
-                        text = page.locator("body").inner_text()
-                        if "Seminars\n" in text:
-                            parts = text.split("Seminars\n")[1].strip().split("\n")
-                            if len(parts) > 1:
-                                data["Presentation Title"] = parts[1].strip()
+                        # Grab the entire raw text of the page
+                        raw_text = page.locator("body").inner_text()
                         
-                        # Extract bio
-                        paragraphs = page.locator(".hw-speaker-content p").all()
-                        if not paragraphs:
-                            paragraphs = page.locator("p").all()
+                        # SEND IT TO THE AI
+                        ai_data = extract_speaker_info(raw_text)
                         
-                        bio_text = []
-                        garbage_phrases = [
-                            "cookies", "privacy", "thank you to our speakers", 
-                            "ambitious people", "hanson wade", "this website uses", 
-                            "by clicking", "opt out", "why not join us", "next event in the", 
-                            "summit here", "register interest", "discover the"
-                        ]
-                        for p_elem in paragraphs:
-                            pt = p_elem.inner_text().strip()
-                            if len(pt) > 50 and not any(phrase in pt.lower() for phrase in garbage_phrases):
-                                bio_text.append(pt)
-                        data["Speaker Summary"] = "\n\n".join(bio_text)
+                        # Merge the AI's flawless extraction into the dataset
+                        if ai_data["name"]: data["Speaker Full Name"] = ai_data["name"]
+                        if ai_data["job_title"]: data["Speaker Job Title"] = ai_data["job_title"]
+                        if ai_data["company"]: data["Speaker Company"] = ai_data["company"]
+                        if ai_data["summary"]: data["Speaker Summary"] = ai_data["summary"]
                         
                         # Email Validation Helper
                         def is_valid_email(em, name, company):

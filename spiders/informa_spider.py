@@ -1,4 +1,5 @@
 from playwright.sync_api import sync_playwright
+from core.ai_extractor import extract_speaker_info
 import re
 from spiders.base_spider import BaseSpider
 
