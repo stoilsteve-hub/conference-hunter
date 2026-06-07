@@ -272,7 +272,7 @@ class Engine:
             if spider_tuple:
                 spider_class, conf_name, topic, speaker_url = spider_tuple
                 
-                # Dynamic override: Route to ArchiveSpider if in failed_domains
+                
                 if any(fd in url for fd in failed_domains):
                     from spiders.archive_spider import ArchiveSpider
                     spider_class = ArchiveSpider
@@ -289,7 +289,7 @@ class Engine:
         total_new_added = 0
         import time
         from concurrent.futures import ThreadPoolExecutor, as_completed
-        max_workers = 1 # Force sequential to avoid IP bans
+        max_workers = 1 
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             future_to_url = {executor.submit(scrape_url, url): url for url in self.urls}
             for future in as_completed(future_to_url):
@@ -298,13 +298,13 @@ class Engine:
                     if data:
                         all_scraped_data.extend(data)
                         
-                        # Save incrementally
+                        
                         if len(all_scraped_data) > 0:
                             added = self.exporter.save_data(all_scraped_data)
                             total_new_added += added
-                            all_scraped_data = [] # Reset after saving
+                            all_scraped_data = [] 
                     
-                    # Mandatory delay to avoid bot blocks
+                    
                     print("Sleeping 7 seconds before hitting next domain...")
                     time.sleep(7)
                 except Exception as e:

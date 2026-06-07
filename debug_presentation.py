@@ -6,7 +6,7 @@ with sync_playwright() as p:
     print("BIO PAGE TEXT:")
     print(page.locator("body").inner_text()[:1000])
     
-    # also try agenda page
+    
     try:
         page.goto("https://peptide-based-therapeutics-summit.com/agenda/", timeout=60000, wait_until="networkidle")
         print("\nAGENDA PAGE TEXT:")

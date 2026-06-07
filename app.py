@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 import os
 
-# Set up page configuration for Scandinavian Dark Mode
+
 st.set_page_config(
     page_title="Conference Hunter",
     page_icon="🎯",
@@ -11,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for Scandinavian Dark Mode (minimalist, clean, high contrast)
+
 st.markdown("""
 <style>
     /* Global background and text colors */
@@ -65,12 +65,12 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Application Header
+
 st.title("🎯 Conference Hunter")
 st.markdown("---")
 
-# Load Data
-@st.cache_data(ttl=3600)
+
+@st.cache_data(ttl=10)
 def load_data():
     file_path = "conference_data.xlsx"
     if not os.path.exists(file_path):
@@ -87,7 +87,7 @@ df = load_data()
 if df.empty:
     st.warning("No data found! Waiting for background scraper to finish...")
 else:
-    # Sidebar Filters
+    
     st.sidebar.title("Filters")
     st.sidebar.markdown("Refine your intelligence")
     
@@ -97,14 +97,14 @@ else:
     companies = sorted(df["Speaker Company"].dropna().unique().tolist())
     selected_companies = st.sidebar.multiselect("Select Companies", companies, default=[])
     
-    # Filter Data
+    
     filtered_df = df.copy()
     if selected_topic != "All":
         filtered_df = filtered_df[filtered_df["Topic"] == selected_topic]
     if selected_companies:
         filtered_df = filtered_df[filtered_df["Speaker Company"].isin(selected_companies)]
         
-    # Key Metrics
+    
     col1, col2, col3, col4 = st.columns(4)
     with col1:
         st.metric("Total Speakers", f"{len(filtered_df):,}")
@@ -117,7 +117,7 @@ else:
         
     st.markdown("---")
     
-    # Download Section
+    
     import io
     
     @st.cache_data
@@ -151,7 +151,7 @@ else:
         
     st.markdown("---")
     
-    # Main Content Area
+    
     col_chart, col_table = st.columns([1, 1.5])
     
     with col_chart:
@@ -159,7 +159,7 @@ else:
         top_companies = filtered_df["Speaker Company"].value_counts().head(10).reset_index()
         top_companies.columns = ["Company", "Count"]
         
-        # Futuristic Bar Chart
+        
         fig = px.bar(
             top_companies, 
             x="Count", 
@@ -180,7 +180,7 @@ else:
 
     with col_table:
         st.subheader("Speaker Database")
-        # Clean dataframe display
+        
         st.dataframe(
             filtered_df,
             use_container_width=True,
@@ -188,5 +188,5 @@ else:
             hide_index=True
         )
 
-# Footer branding
+
 st.markdown('<div class="footer">Programmed by <b>Steve Zhelyazkov</b> | Conference Hunter 2026</div>', unsafe_allow_html=True)

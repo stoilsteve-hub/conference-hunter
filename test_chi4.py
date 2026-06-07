@@ -7,7 +7,7 @@ def run():
         page = browser.new_page()
         page.goto("https://www.immunogenicitysummit.com/22/immunogenicity-prediction", timeout=60000, wait_until="networkidle")
         
-        # Look for the word "PhD" or "MD" which are common in speakers
+        
         html = page.content()
         lines = html.split('\n')
         for i, line in enumerate(lines):

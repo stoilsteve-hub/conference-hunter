@@ -7,8 +7,8 @@ with sync_playwright() as p:
     topic = ""
     if "Seminars\n" in text:
         parts = text.split("Seminars\n")[1].strip().split("\n")
-        # Line 0 is usually date: Wednesday 29th April 2026
-        # Line 1 is the title: Peptide Industry Leaders...
+        
+        
         if len(parts) > 1:
             topic = parts[1].strip()
     print("TOPIC EXTRACTED:", topic)

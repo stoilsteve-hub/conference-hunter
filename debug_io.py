@@ -4,6 +4,6 @@ with sync_playwright() as p:
     page = browser.new_page()
     page.goto("https://www.immuno-oncologyeurope.com/speaker-biographies", timeout=60000, wait_until="domcontentloaded")
     print("STRONGS DOMCONTENTLOADED:", len(page.locator("p > strong, div > strong").all()))
-    page.goto("https://www.immuno-oncologyeurope.com/speaker-biographies", timeout=60000) # wait_until=load
+    page.goto("https://www.immuno-oncologyeurope.com/speaker-biographies", timeout=60000) 
     print("STRONGS LOAD:", len(page.locator("p > strong, div > strong").all()))
     browser.close()

@@ -6,7 +6,7 @@ def run():
         page = browser.new_page()
         page.goto("https://www.immunogenicitysummit.com/22/immunogenicity-prediction", timeout=60000, wait_until="networkidle")
         
-        # In CHI websites, speakers might be listed in tables, or specific tags. Let's dump all text from main content area.
+        
         content = page.locator("body").inner_text()
         print(content[:1000])
             

@@ -21,30 +21,30 @@ for idx, row in df.iterrows():
     title = str(row['Speaker Job Title']).strip()
     company = str(row['Speaker Company']).strip()
     
-    # 1. Empty Names
+    
     if name == 'nan' or not name:
         issues['empty_names'].append(idx)
         continue
         
-    # 2. Long Names
+    
     if len(name) > 40 or len(name.split()) > 5:
         issues['long_names'].append((idx, name))
         
-    # 3. Garbage Names
+    
     if any(k.lower() in name.lower() for k in garbage_keywords):
         issues['garbage_names'].append((idx, name))
         
-    # 4. URLs
+    
     if 'http' in name or 'http' in title or 'http' in company:
         issues['urls_in_wrong_places'].append(idx)
         
-    # 5. Title in Company
+    
     if company != 'nan' and any(k.lower() in company.lower() for k in title_keywords):
-        # Only flag if it really looks like a pure title string
+        
         if not any(c.lower() in company.lower() for c in company_keywords):
             issues['title_in_company'].append((idx, company))
             
-    # 6. Company in Title
+    
     if title != 'nan' and any(k.lower() in title.lower() for k in company_keywords):
         if not any(t.lower() in title.lower() for t in title_keywords):
             issues['company_in_title'].append((idx, title))

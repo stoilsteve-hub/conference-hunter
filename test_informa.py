@@ -6,7 +6,7 @@ def run():
         page = browser.new_page()
         page.goto("https://informaconnect.com/bioprocessinternational/speakers/", timeout=60000, wait_until="networkidle")
         
-        # In Informa websites, speakers are usually in specific divs.
+        
         html = page.content()
         lines = html.split('\n')
         for i, line in enumerate(lines):

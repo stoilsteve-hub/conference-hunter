@@ -3,7 +3,7 @@ import pandas as pd
 df = pd.read_excel('conference_data.xlsx')
 original_len = len(df)
 
-# Drop rows where Speaker First Name or Full Name is obviously a sentence (more than 5 words and no name indicators)
+
 def is_garbage_name(name):
     name = str(name).strip()
     words = name.split()
@@ -16,7 +16,7 @@ def is_garbage_name(name):
 
 df = df[~df['Speaker Full Name'].apply(is_garbage_name)]
 
-# Fix 'Moderator: James Little'
+
 def fix_moderator(name):
     name = str(name)
     if name.lower().startswith('moderator:'):

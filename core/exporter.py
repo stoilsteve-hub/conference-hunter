@@ -4,7 +4,7 @@ import os
 class Exporter:
     def __init__(self, output_file="conference_data.xlsx"):
         self.output_file = output_file
-        # These are the columns requested
+        
         self.columns = [
             "Conference ID", "Conference Name", "Topic", "Dates", "Location",
             "Speaker First Name", "Speaker Full Name", "Speaker Job Title",
@@ -64,13 +64,13 @@ class Exporter:
             
         new_df = pd.DataFrame(new_data_list, columns=self.columns)
         
-        # check if file exists, if not create new dataframe
+        
         if os.path.exists(self.output_file):
             df = pd.read_excel(self.output_file)
             before_len = len(df)
             combined = pd.concat([df, new_df], ignore_index=True)
-            # Drop duplicates keeping the first occurrence (which would be the existing one if it exists)
-            # or keep the last to overwrite with fresh data. Let's keep last to update with new rich data
+            
+            
             combined.drop_duplicates(subset=['Speaker Full Name', 'Conference Name'], keep='last', inplace=True)
             after_len = len(combined)
             new_added = after_len - before_len
@@ -79,7 +79,7 @@ class Exporter:
             df = new_df
             new_added = len(df)
             
-        # Standardize Dates and Locations
+        
         for i, row in df.iterrows():
             raw_date = str(row['Dates']) if pd.notnull(row['Dates']) else ""
             raw_loc = str(row['Location']) if pd.notnull(row['Location']) else "TBD"

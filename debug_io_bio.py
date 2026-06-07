@@ -3,7 +3,7 @@ with sync_playwright() as p:
     browser = p.chromium.launch(headless=True)
     page = browser.new_page()
     page.goto("https://www.immuno-oncologyeurope.com/speaker-biographies", timeout=60000, wait_until="networkidle")
-    # Click the first bio link
+    
     bio_link = page.locator("a:has-text('Bio')").first
     bio_link.click()
     page.wait_for_selector(".spkr-modal-content", timeout=10000)

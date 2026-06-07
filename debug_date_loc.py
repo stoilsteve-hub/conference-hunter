@@ -8,7 +8,7 @@ def inspect(url):
         page.goto(url, timeout=30000, wait_until="domcontentloaded")
         print("TITLE:", page.title())
         
-        # also get all text from the body to see where the date is
+        
         text = page.locator("body").inner_text()
         lines = text.split('\n')
         for line in lines[:30]:

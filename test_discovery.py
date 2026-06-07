@@ -7,7 +7,7 @@ def test(url):
         page = browser.new_page()
         page.goto(url, timeout=60000, wait_until="networkidle")
         
-        # Method 1: Find all links and check inner text
+        
         links = page.locator("a").all()
         found_url = None
         for a in links:
@@ -19,7 +19,7 @@ def test(url):
                         found_url = url.rstrip("/") + href
                     else:
                         found_url = href
-                    # Prefer exact match or something reasonable
+                    
                     if "/speaker" in found_url.lower():
                         break
             except Exception:

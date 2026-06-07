@@ -3,7 +3,7 @@ from core.engine import Engine
 import main
 
 e = Engine()
-# Extract the failed_domains from engine
+
 failed_domains = [
     "mrna-processmanufacturing.com", "cell-therapy-analytics-europe.com", "genetherapy-ophthalmology.com",
     "genetherapy-immunogenicity.com", "inner-ear-disorders-therapeutics.com", "gamma-delta-t-therapies-summit.com",

@@ -7,7 +7,7 @@ def run():
         page.goto("https://www.immunogenicitysummit.com/22/immunogenicity-prediction", timeout=60000, wait_until="networkidle")
         print("Title:", page.title())
         
-        # Look for speaker elements
+        
         speakers = page.locator("h4, .speaker, [class*='speaker']").all_text_contents()
         for s in speakers[:10]:
             print(s.strip())

@@ -6,7 +6,7 @@ count = 0
 def fix_all_phds(row):
     global count
     title = str(row['Speaker Job Title']).strip()
-    # Check ignoring case
+    
     if title.upper() in ['PHD', 'MD', 'PH.D.', 'M.D.', 'MSC', 'PHARMD', 'MBA', 'M.S.']:
         row['Speaker Full Name'] = str(row['Speaker Full Name']) + ', ' + title
         row['Speaker Job Title'] = str(row['Speaker Company'])

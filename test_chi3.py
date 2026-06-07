@@ -6,8 +6,8 @@ def run():
         page = browser.new_page()
         page.goto("https://www.immunogenicitysummit.com/22/immunogenicity-prediction", timeout=60000, wait_until="networkidle")
         
-        # Look for typical speaker elements in CHI.
-        # Often it's <span class="speaker-name"> or something. Let's query selector all h4 tags and see what's in them.
+        
+        
         els = page.locator("h4").all()
         for i, el in enumerate(els[:5]):
             print("--- H4", i)
@@ -15,7 +15,7 @@ def run():
             print(el.evaluate("el => el.innerHTML"))
             
         print("---")
-        # How about b tags or strong tags that might contain speaker names?
+        
         sp_tags = page.locator("p > b, p > strong").all()
         count = 0
         for tag in sp_tags:

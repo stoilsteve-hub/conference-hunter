@@ -10,7 +10,7 @@ def fix_swapped(row):
     title = str(row['Speaker Job Title']).strip()
     comp = str(row['Speaker Company']).strip()
     
-    # If Company is empty, and Title contains Company words but NO Title words
+    
     if (comp == 'nan' or comp == '') and title and title != 'nan':
         if any(ci.lower() in title.lower() for ci in company_indicators):
             if not any(ti.lower() in title.lower() for ti in title_indicators):

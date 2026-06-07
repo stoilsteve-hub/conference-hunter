@@ -5,7 +5,7 @@ with sync_playwright() as p:
     page = browser.new_page()
     page.goto("https://www.immuno-oncologyeurope.com/speaker-biographies", timeout=60000, wait_until="networkidle")
     
-    # Close tracking consent if it blocks clicks
+    
     try:
         page.evaluate("if(typeof TrackingConsentManager !== 'undefined') TrackingConsentManager.updateUserConsent(true);")
     except:
@@ -17,11 +17,11 @@ with sync_playwright() as p:
         if name not in ["Cookie Policy", "Warning!", "Filter by:", ""] and len(name.split()) > 1:
             print("Trying speaker:", name)
             
-            # spkr_org
+            
             spkr_org = s.evaluate("node => { let n = node.parentNode; while(n && !n.classList.contains('spkr-name')) n = n.parentNode; return n && n.nextElementSibling && n.nextElementSibling.classList.contains('spkr-org') ? n.nextElementSibling.innerText : ''; }")
             print("ORG:", spkr_org)
             
-            # click bio
+            
             try:
                 bio_link = s.evaluate_handle("node => { let n = node.parentNode; while(n && !n.classList.contains('spkr-name')) n = n.parentNode; return n && n.parentElement ? Array.from(n.parentElement.querySelectorAll('a')).find(a => a.innerText.includes('Bio')) : null; }")
                 if bio_link:
