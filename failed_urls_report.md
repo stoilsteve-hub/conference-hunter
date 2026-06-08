@@ -463,7 +463,7 @@ This document lists the speakers where the AI could not find the requested data,
 - Martin Kane (No URL available on source site)
 - Keith M. Bower (No URL available on source site)
 
-## Missing Job Titles (Total: 94)
+## Missing Job Titles (Total: 95)
 
 - Annarosa Arcangeli (No URL available on source site)
 - Xiaoping Bao (No URL available on source site)
@@ -559,3 +559,4 @@ This document lists the speakers where the AI could not find the requested data,
 - Vibha (No URL available on source site)
 - Zuben E. Sauna (No URL available on source site)
 - Bonita (Bonnie) Rup (No URL available on source site)
+- Eden Turner: https://informaconnect.com/bioprocessinternational/contact/

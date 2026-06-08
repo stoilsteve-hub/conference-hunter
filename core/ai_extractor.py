@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
 api_key = os.environ.get("GEMINI_API_KEY")
 if api_key:
     client = genai.Client(api_key=api_key)
@@ -28,25 +27,24 @@ def extract_speaker_info(raw_text):
             "name", "job_title", "company", "summary".
             
             Rules:
-            - CRITICAL: If the text does NOT describe a specific human individual (e.g., it is a marketing paragraph, an event description, a panel title, a photo gallery, or a sponsor ad), you MUST return perfectly empty strings "" for ALL fields.
-            - If a field cannot be determined, you MUST return a perfectly empty string "". Do NOT return "nan", "null", "N/A", or "None".
-            - "company": MUST be a valid corporate or organizational entity (e.g., Pfizer, Moderna, Harvard University).
-            - "job_title": MUST be the role or profession (e.g., Director, CEO, Scientist).
-            - If a string describes a department, division, or scientific area (e.g., "Discovery & Preclinical Development", "Department of Oncology", "Market Access Strategy"), IT IS NOT A COMPANY. Combine it with the "job_title".
-            - "summary" should be a biography paragraph. Strip out any spam, 404 errors, or marketing boilerplate (e.g., event locations, "Next in Series", etc.).
+            - AGGRESSIVELY EXTRACT DATA. Even if the text is messy, contains Wayback Machine garbage, marketing text, or event descriptions, FIND the speaker's name, title, company, and bio and extract them.
+            - Do NOT reject the page unless there is absolutely zero human biographical data present.
+            - If a specific field cannot be determined, return an empty string "" for that field only. Do NOT return "nan", "null", "N/A", or "None".
+            - "company": Try to find a corporate or organizational entity.
+            - "job_title": Try to find the role or profession.
+            - "summary": Extract the biography paragraph. It's okay if it contains some conference jargon.
             
             Text to analyze:
             {raw_text}
             """
             
             response = client.models.generate_content(
-                model='gemini-2.5-flash',
+                model='gemini-1.5-flash',
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json"
                 )
             )
-            
             
             data = json.loads(response.text)
             
